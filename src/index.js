@@ -53,15 +53,33 @@ function preload() {
     this.load.audio('shipBoom', 'src/assets/shipBoom.wav', {
         instances: 3,
     });
+    this.load.audio('shipBoom2', 'src/assets/shipBoom2.mp3', {
+        instances: 3,
+    });
     this.load.audio('heroShot', 'src/assets/laser1.wav', {
         instances: 5,
     });
+    this.load.audio('heroBulletsEmpty', 'src/assets/heroBulletsEmpty.mp3', {
+        instances: 3,
+    });
 }
+
+const INITIAL_BULLETS_COUNT = 10;
+const BULLETS_BONUS = 2;
 
 function create() {
     this.player = this.add.image(400, 300, 'sky');
     this.player = this.physics.add.image(400, 300, 'hero');
     this.player.setCollideWorldBounds(true);
+
+    this.add.image(30, 26, 'rocketShot');
+    this.add.image(this.game.config.width - 65, 26, 'pasha');
+
+    this.shipsCount = 0;
+    this.shipsText = this.add.text(this.game.config.width - 45, 16, '', { fontSize: '20px', fill: '#fff' });
+
+    this.bulletsCount = INITIAL_BULLETS_COUNT;
+    this.bulletsText = this.add.text(45, 16, '', { fontSize: '20px', fill: '#fff' });
 
     this.ships = this.physics.add.group();
     this.time.addEvent({
@@ -107,6 +125,9 @@ function create() {
             this.sound.play('shipBoom', { volume: 0.5 });
             ship1.destroy();
             ship2.destroy();
+
+            this.bulletsCount += BULLETS_BONUS;
+            this.shipsCount += 2;
         }
     });
 
@@ -119,7 +140,10 @@ function create() {
             const boom = new Phaser.GameObjects.Sprite(this, ship.x, ship.y, 'boom');
             this.add.existing(boom);
             boom.anims.play('boom');
-            this.sound.play('shipBoom', { volume: 0.5 });
+            this.sound.play('shipBoom2', { volume: 0.5 });
+
+            this.bulletsCount += BULLETS_BONUS;
+            this.shipsCount += 1;
         }
     });
 
@@ -167,13 +191,21 @@ function update() {
     }
 
     if (this.player.visible && Phaser.Input.Keyboard.JustDown(this.spacebar)) {
-        this.sound.play('heroShot', { volume: 0.2 });
-        const bullet = this.bullets.get();
+        if (this.bulletsCount) {
+            this.sound.play('heroShot', { volume: 0.2 });
+            const bullet = this.bullets.get();
 
-        if (bullet) {
-            bullet.fire(this.player.x, this.player.y, this.player.body.velocity.x, this.player.body.velocity.y);
+            if (bullet) {
+                bullet.fire(this.player.x, this.player.y, this.player.body.velocity.x, this.player.body.velocity.y);
+                this.bulletsCount -= 1;
+            }
+        } else {
+            this.sound.play('heroBulletsEmpty', { volume: 0.5 });
         }
     }
+
+    this.bulletsText.setText(`${this.bulletsCount}`);
+    this.shipsText.setText(`${this.shipsCount}`);
 
     this.bullets.children.each((bullet) => {
         if (bullet.active) {
