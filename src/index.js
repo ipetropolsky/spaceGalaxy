@@ -10,6 +10,7 @@ const Bullet = new Phaser.Class({
 
     fire(x, y, vx, vy) {
         this.setPosition(x, y);
+        this.setDepth(90);
 
         this.body.velocity.x = vx;
         this.body.velocity.y = vy;
@@ -61,6 +62,9 @@ function preload() {
     this.load.audio('missile', 'src/assets/missile.mp3', {
         instances: 3,
     });
+    this.load.audio('ammo', 'src/assets/ammo.mp3', {
+        instances: 3,
+    });
 }
 
 const INITIAL_BULLETS_COUNT = 10;
@@ -76,6 +80,7 @@ function create() {
 
     this.player = this.physics.add.image(400, 300, 'hero');
     this.player.setCollideWorldBounds(true);
+    this.player.setDepth(100);
 
     this.add.image(30, 26, 'rocketShot');
     this.add.image(this.game.config.width - 65, 26, 'ship');
@@ -104,11 +109,32 @@ function create() {
     };
     this.time.addEvent(eventConfig);
 
+    this.ammo = this.physics.add.group();
     this.bullets = this.physics.add.group({
         classType: Bullet,
         maxSize: 30,
         runChildUpdate: true,
     });
+
+    const putAmmo = (x, y, vx, vy) => {
+        const ammo = new Phaser.GameObjects.Sprite(this, x, y, 'rocketShot');
+        this.add.existing(ammo);
+        this.ammo.add(ammo);
+        ammo.body.setAngularVelocity(100);
+        ammo.body.velocity.x = vx;
+        ammo.body.velocity.y = vy;
+        const children = this.ammo.getChildren();
+        if (children.length) {
+            ammo.body.rotation = children[0].body.rotation;
+        }
+    };
+
+    const destroyShip = (ship) => {
+        if (ship.getData('speed') > 0.6) {
+            putAmmo(ship.x, ship.y, ship.body.velocity.x, ship.body.velocity.y);
+        }
+        ship.destroy();
+    };
 
     this.physics.add.overlap(this.player, this.ships, (player, ship) => {
         if (player.visible) {
@@ -118,7 +144,16 @@ function create() {
             this.add.existing(boom);
             boom.anims.play('boom');
             this.sound.play('heroBoom', { volume: 0.5 });
-            ship.destroy();
+            destroyShip(ship);
+        }
+    });
+
+    this.physics.add.overlap(this.player, this.ammo, (player, ammo) => {
+        if (player.visible) {
+            ammo.setVisible(false);
+            this.sound.play('ammo', { volume: 0.5 });
+            this.bulletsCount += BULLETS_BONUS;
+            ammo.destroy();
         }
     });
 
@@ -130,10 +165,9 @@ function create() {
             this.add.existing(boom);
             boom.anims.play('boom');
             this.sound.play('shipBoom', { volume: 0.5 });
-            ship1.destroy();
-            ship2.destroy();
+            destroyShip(ship1);
+            destroyShip(ship2);
 
-            this.bulletsCount += BULLETS_BONUS;
             this.shipsCount += 2;
         }
     });
@@ -142,15 +176,14 @@ function create() {
         if (bullet.active && ship.visible) {
             ship.setVisible(false);
             bullet.deactivate();
-            ship.destroy();
 
             const boom = new Phaser.GameObjects.Sprite(this, ship.x, ship.y, 'boom');
             this.add.existing(boom);
             boom.anims.play('boom');
             this.sound.play('shipBoom', { volume: 0.5 });
 
-            this.bulletsCount += BULLETS_BONUS;
             this.shipsCount += 1;
+            destroyShip(ship);
         }
     });
 
@@ -241,6 +274,12 @@ function update() {
         if (ship.y - ship.displayHeight / 2 > this.game.config.height) {
             this.sound.play('missile', { volume: 0.2 + 0.5 * ship.getData('speed') });
             ship.destroy();
+        }
+    });
+
+    this.ammo.children.each((ammo) => {
+        if (ammo.y - ammo.displayHeight / 2 > this.game.config.height) {
+            ammo.destroy();
         }
     });
 }
