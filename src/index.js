@@ -68,7 +68,7 @@ const BULLETS_BONUS = 2;
 const MIN_SHIP_SPEED = 100;
 const MAX_SHIP_SPEED = 300;
 const speedMultiplier = 1;
-const sceneSpeed = 0;
+const sceneSpeed = 1;
 
 function create() {
     this.sky = this.add.tileSprite(400, 300, 1920, 2156, 'sky');
@@ -87,9 +87,9 @@ function create() {
     this.bulletsText = this.add.text(45, 16, '', { fontSize: '20px', fill: '#fff' });
 
     this.ships = this.physics.add.group();
-    this.newShipEvent = this.time.addEvent({
+    const eventConfig = {
         delay: 1000,
-        callback() {
+        callback: () => {
             const ship = new Phaser.GameObjects.Sprite(this, 50 + Math.random() * 700, -50, 'ship');
             this.add.existing(ship);
             ship.setRotation(Math.PI);
@@ -99,10 +99,10 @@ function create() {
             const speed = Math.random();
             ship.body.velocity.y = (MIN_SHIP_SPEED + speed * (MAX_SHIP_SPEED - MIN_SHIP_SPEED)) * speedMultiplier;
             ship.setData('speed', speed);
+            this.time.addEvent({ ...eventConfig, delay: 750 + Math.random() * 750 });
         },
-        callbackScope: this,
-        loop: true,
-    });
+    };
+    this.time.addEvent(eventConfig);
 
     this.bullets = this.physics.add.group({
         classType: Bullet,
@@ -239,7 +239,7 @@ function update() {
 
     this.ships.children.each((ship) => {
         if (ship.y - ship.displayHeight / 2 > this.game.config.height) {
-            this.sound.play('missile', { volume: 0.4 + 0.6 * ship.getData('speed') });
+            this.sound.play('missile', { volume: 0.2 + 0.5 * ship.getData('speed') });
             ship.destroy();
         }
     });
