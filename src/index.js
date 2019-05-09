@@ -62,6 +62,9 @@ function preload() {
     this.load.audio('heroBulletsEmpty', 'src/assets/heroBulletsEmpty.mp3', {
         instances: 3,
     });
+    this.load.audio('missile', 'src/assets/missile.mp3', {
+        instances: 3,
+    });
 }
 
 const INITIAL_BULLETS_COUNT = 10;
@@ -91,7 +94,9 @@ function create() {
             ship.anims.play('pasha_fire');
             this.ships.add(ship);
             ship.setScale(2);
-            ship.body.velocity.y = 100 + Math.random() * 200;
+            const speed = Math.random();
+            ship.body.velocity.y = 100 + speed * 200;
+            ship.setData('speed', speed);
         },
         callbackScope: this,
         loop: true,
@@ -215,7 +220,8 @@ function update() {
     });
 
     this.ships.children.each((ship) => {
-        if (ship.y > this.game.config.height + ship.displayHeight) {
+        if (ship.y - ship.displayHeight / 2 > this.game.config.height) {
+            this.sound.play('missile', { volume: 0.2 + 0.6 * ship.getData('speed') });
             ship.destroy();
         }
     });
