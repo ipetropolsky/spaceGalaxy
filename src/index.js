@@ -5,7 +5,6 @@ const Bullet = new Phaser.Class({
 
     initialize: function Bullet(scene) {
         Phaser.GameObjects.Image.call(this, scene, 0, 0, 'rocketShot');
-
         this.speed = Phaser.Math.GetSpeed(400, 1);
     },
 
@@ -40,23 +39,20 @@ const Bullet = new Phaser.Class({
 
 function preload() {
     this.load.image('hero', 'src/assets/space_ship.png');
-    this.load.image('sky', 'src/assets/navy-star-wallpaper.jpg');
+    this.load.image('sky', 'src/assets/sky23.png');
     this.load.image('rocketShot', 'src/assets/rocketShot.png');
-    this.load.spritesheet('pasha', 'src/assets/starblast_ship_gray.png', { frameWidth: 28, frameHeight: 14 });
+    this.load.spritesheet('ship', 'src/assets/starblast_ship_gray.png', { frameWidth: 28, frameHeight: 14 });
     this.load.spritesheet('boom', 'src/assets/blast-vector-gif-animation-16.png', {
         frameWidth: 400,
         frameHeight: 288,
     });
-    this.load.audio('heroBoom', 'src/assets/heroBoom.wav', {
+    this.load.audio('heroBoom', 'src/assets/heroBoom.mp3', {
         instances: 1,
     });
-    this.load.audio('shipBoom', 'src/assets/shipBoom.wav', {
+    this.load.audio('shipBoom', 'src/assets/shipBoom.mp3', {
         instances: 3,
     });
-    this.load.audio('shipBoom2', 'src/assets/shipBoom2.mp3', {
-        instances: 3,
-    });
-    this.load.audio('heroShot', 'src/assets/laser1.wav', {
+    this.load.audio('heroShot', 'src/assets/laser1.mp3', {
         instances: 5,
     });
     this.load.audio('heroBulletsEmpty', 'src/assets/heroBulletsEmpty.mp3', {
@@ -69,14 +65,20 @@ function preload() {
 
 const INITIAL_BULLETS_COUNT = 10;
 const BULLETS_BONUS = 2;
+const MIN_SHIP_SPEED = 100;
+const MAX_SHIP_SPEED = 300;
+const speedMultiplier = 1;
+const sceneSpeed = 0;
 
 function create() {
-    this.player = this.add.image(400, 300, 'sky');
+    this.sky = this.add.tileSprite(400, 300, 1920, 2156, 'sky');
+    this.sky.setScale(0.42);
+
     this.player = this.physics.add.image(400, 300, 'hero');
     this.player.setCollideWorldBounds(true);
 
     this.add.image(30, 26, 'rocketShot');
-    this.add.image(this.game.config.width - 65, 26, 'pasha');
+    this.add.image(this.game.config.width - 65, 26, 'ship');
 
     this.shipsCount = 0;
     this.shipsText = this.add.text(this.game.config.width - 45, 16, '', { fontSize: '20px', fill: '#fff' });
@@ -85,17 +87,17 @@ function create() {
     this.bulletsText = this.add.text(45, 16, '', { fontSize: '20px', fill: '#fff' });
 
     this.ships = this.physics.add.group();
-    this.time.addEvent({
+    this.newShipEvent = this.time.addEvent({
         delay: 1000,
         callback() {
-            const ship = new Phaser.GameObjects.Sprite(this, 50 + Math.random() * 700, -50, 'pasha');
+            const ship = new Phaser.GameObjects.Sprite(this, 50 + Math.random() * 700, -50, 'ship');
             this.add.existing(ship);
             ship.setRotation(Math.PI);
-            ship.anims.play('pasha_fire');
+            ship.anims.play('ship_fire');
             this.ships.add(ship);
             ship.setScale(2);
             const speed = Math.random();
-            ship.body.velocity.y = 100 + speed * 200;
+            ship.body.velocity.y = (MIN_SHIP_SPEED + speed * (MAX_SHIP_SPEED - MIN_SHIP_SPEED)) * speedMultiplier;
             ship.setData('speed', speed);
         },
         callbackScope: this,
@@ -145,7 +147,7 @@ function create() {
             const boom = new Phaser.GameObjects.Sprite(this, ship.x, ship.y, 'boom');
             this.add.existing(boom);
             boom.anims.play('boom');
-            this.sound.play('shipBoom2', { volume: 0.5 });
+            this.sound.play('shipBoom', { volume: 0.5 });
 
             this.bulletsCount += BULLETS_BONUS;
             this.shipsCount += 1;
@@ -153,8 +155,8 @@ function create() {
     });
 
     this.anims.create({
-        key: 'pasha_fire',
-        frames: this.anims.generateFrameNumbers('pasha', { start: 0, end: 2 }),
+        key: 'ship_fire',
+        frames: this.anims.generateFrameNumbers('ship', { start: 0, end: 2 }),
         frameRate: 10,
         repeat: Infinity,
     });
@@ -179,20 +181,36 @@ const maxVelocity = velocityStep * 30;
 const bulletVelocityStep = 3;
 
 function update() {
+    this.sky.tilePositionY -= sceneSpeed;
+
     if (this.cursors.left.isDown) {
-        this.player.body.velocity.x = Math.max(this.player.body.velocity.x - velocityStep, -maxVelocity);
+        this.player.body.velocity.x = Math.max(
+            this.player.body.velocity.x - velocityStep * speedMultiplier,
+            -maxVelocity * speedMultiplier
+        );
     } else if (this.cursors.right.isDown) {
-        this.player.body.velocity.x = Math.min(this.player.body.velocity.x + velocityStep, maxVelocity);
+        this.player.body.velocity.x = Math.min(
+            this.player.body.velocity.x + velocityStep * speedMultiplier,
+            maxVelocity * speedMultiplier
+        );
     } else if (this.player.body.velocity.x) {
-        this.player.body.velocity.x += velocityStep * 0.5 * (this.player.body.velocity.x > 0 ? -1 : 1);
+        this.player.body.velocity.x +=
+            velocityStep * speedMultiplier * 0.5 * (this.player.body.velocity.x > 0 ? -1 : 1);
     }
 
     if (this.cursors.up.isDown) {
-        this.player.body.velocity.y = Math.max(this.player.body.velocity.y - velocityStep, -maxVelocity);
+        this.player.body.velocity.y = Math.max(
+            this.player.body.velocity.y - velocityStep * speedMultiplier,
+            -maxVelocity * speedMultiplier
+        );
     } else if (this.cursors.down.isDown) {
-        this.player.body.velocity.y = Math.min(this.player.body.velocity.y + velocityStep, maxVelocity);
+        this.player.body.velocity.y = Math.min(
+            this.player.body.velocity.y + velocityStep * speedMultiplier,
+            maxVelocity * speedMultiplier
+        );
     } else if (this.player.body.velocity.y) {
-        this.player.body.velocity.y += velocityStep * 0.5 * (this.player.body.velocity.y > 0 ? -1 : 1);
+        this.player.body.velocity.y +=
+            velocityStep * speedMultiplier * 0.5 * (this.player.body.velocity.y > 0 ? -1 : 1);
     }
 
     if (this.player.visible && Phaser.Input.Keyboard.JustDown(this.spacebar)) {
@@ -214,14 +232,14 @@ function update() {
 
     this.bullets.children.each((bullet) => {
         if (bullet.active) {
-            bullet.body.velocity.x += bulletVelocityStep * (bullet.body.velocity.x > 0 ? -1 : 1);
-            bullet.body.velocity.y += bulletVelocityStep * (bullet.body.velocity.y > 0 ? -1 : 1);
+            bullet.body.velocity.x += bulletVelocityStep * speedMultiplier * (bullet.body.velocity.x > 0 ? -1 : 1);
+            bullet.body.velocity.y += bulletVelocityStep * speedMultiplier * (bullet.body.velocity.y > 0 ? -1 : 1);
         }
     });
 
     this.ships.children.each((ship) => {
         if (ship.y - ship.displayHeight / 2 > this.game.config.height) {
-            this.sound.play('missile', { volume: 0.2 + 0.6 * ship.getData('speed') });
+            this.sound.play('missile', { volume: 0.4 + 0.6 * ship.getData('speed') });
             ship.destroy();
         }
     });
