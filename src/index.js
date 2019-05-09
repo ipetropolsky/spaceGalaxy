@@ -1,8 +1,47 @@
 import Phaser from 'phaser';
 
+const Bullet = new Phaser.Class({
+    Extends: Phaser.GameObjects.Image,
+
+    initialize: function Bullet(scene) {
+        Phaser.GameObjects.Image.call(this, scene, 0, 0, 'rocketShot');
+
+        this.speed = Phaser.Math.GetSpeed(400, 1);
+    },
+
+    fire(x, y, vx, vy) {
+        this.setPosition(x, y);
+
+        this.body.velocity.x = vx;
+        this.body.velocity.y = vy;
+
+        this.setActive(true);
+        this.setVisible(true);
+    },
+
+    update(time, delta) {
+        this.y -= this.speed * delta;
+
+        if (this.y < -this.displayHeight) {
+            this.deactivate();
+        }
+    },
+
+    deactivate() {
+        this.setPosition(-100, -100);
+
+        this.body.velocity.x = 0;
+        this.body.velocity.y = 0;
+
+        this.setActive(false);
+        this.setVisible(false);
+    },
+});
+
 function preload() {
     this.load.image('hero', 'src/assets/space_ship.png');
     this.load.image('sky', 'src/assets/navy-star-wallpaper.jpg');
+    this.load.image('rocketShot', 'src/assets/rocketShot.png');
     this.load.spritesheet('pasha', 'src/assets/starblast_ship_gray.png', { frameWidth: 28, frameHeight: 14 });
     this.load.spritesheet('boom', 'src/assets/blast-vector-gif-animation-16.png', {
         frameWidth: 400,
@@ -13,6 +52,9 @@ function preload() {
     });
     this.load.audio('shipBoom', 'src/assets/shipBoom.wav', {
         instances: 3,
+    });
+    this.load.audio('heroShot', 'src/assets/laser1.wav', {
+        instances: 5,
     });
 }
 
@@ -35,6 +77,12 @@ function create() {
         },
         callbackScope: this,
         loop: true,
+    });
+
+    this.bullets = this.physics.add.group({
+        classType: Bullet,
+        maxSize: 30,
+        runChildUpdate: true,
     });
 
     this.physics.add.overlap(this.player, this.ships, (player, ship) => {
@@ -62,6 +110,19 @@ function create() {
         }
     });
 
+    this.physics.add.overlap(this.bullets, this.ships, (bullet, ship) => {
+        if (bullet.active && ship.visible) {
+            ship.setVisible(false);
+            bullet.deactivate();
+            ship.destroy();
+
+            const boom = new Phaser.GameObjects.Sprite(this, ship.x, ship.y, 'boom');
+            this.add.existing(boom);
+            boom.anims.play('boom');
+            this.sound.play('shipBoom', { volume: 0.5 });
+        }
+    });
+
     this.anims.create({
         key: 'pasha_fire',
         frames: this.anims.generateFrameNumbers('pasha', { start: 0, end: 2 }),
@@ -81,10 +142,12 @@ function create() {
     this.player.setScale(2, 2);
 
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 }
 
 const velocityStep = 10;
 const maxVelocity = velocityStep * 30;
+const bulletVelocityStep = 3;
 
 function update() {
     if (this.cursors.left.isDown) {
@@ -103,6 +166,22 @@ function update() {
         this.player.body.velocity.y += velocityStep * 0.5 * (this.player.body.velocity.y > 0 ? -1 : 1);
     }
 
+    if (this.player.visible && Phaser.Input.Keyboard.JustDown(this.spacebar)) {
+        this.sound.play('heroShot', { volume: 0.2 });
+        const bullet = this.bullets.get();
+
+        if (bullet) {
+            bullet.fire(this.player.x, this.player.y, this.player.body.velocity.x, this.player.body.velocity.y);
+        }
+    }
+
+    this.bullets.children.each((bullet) => {
+        if (bullet.active) {
+            bullet.body.velocity.x += bulletVelocityStep * (bullet.body.velocity.x > 0 ? -1 : 1);
+            bullet.body.velocity.y += bulletVelocityStep * (bullet.body.velocity.y > 0 ? -1 : 1);
+        }
+    });
+
     this.ships.children.each((ship) => {
         if (ship.y > this.game.config.height + ship.displayHeight) {
             ship.destroy();
@@ -118,12 +197,12 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { x: 0, y: 0 },
-            debug: true,
+            // debug: true,
         },
         impact: {
             gravity: 50,
             maxVelocity: 800,
-            debug: true,
+            // debug: true,
         },
     },
     pixelArt: true,
