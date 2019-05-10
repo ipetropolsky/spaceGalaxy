@@ -99,6 +99,7 @@ function create() {
     this.player = this.physics.add.image(400, 300, 'hero');
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(100);
+    this.player.setScale(2, 2);
 
     this.add.image(30, 26, 'rocketShot');
     this.add.image(this.game.config.width - 65, 26, 'ship');
@@ -253,9 +254,6 @@ function create() {
     });
 
     this.cameras.main.setBounds(0, 0, 400, 300);
-
-    this.player.setScale(2, 2);
-
     this.cursors = this.input.keyboard.createCursorKeys();
     this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 }
