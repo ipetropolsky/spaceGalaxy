@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 
+let game;
+
 const Bullet = new Phaser.Class({
     Extends: Phaser.GameObjects.Image,
 
@@ -8,9 +10,12 @@ const Bullet = new Phaser.Class({
         this.speed = Phaser.Math.GetSpeed(400, 1);
     },
 
+    direction: -1,
+
     fire(x, y, vx, vy) {
         this.setPosition(x, y);
         this.setDepth(90);
+        this.setRotation(this.direction < 0 ? 0 : Math.PI);
 
         this.body.velocity.x = vx;
         this.body.velocity.y = vy;
@@ -19,10 +24,14 @@ const Bullet = new Phaser.Class({
         this.setVisible(true);
     },
 
-    update(time, delta) {
-        this.y -= this.speed * delta;
+    outOfScene() {
+        return this.y < -this.displayHeight;
+    },
 
-        if (this.y < -this.displayHeight) {
+    update(time, delta) {
+        this.y += this.speed * delta * this.direction;
+
+        if (this.outOfScene()) {
             this.deactivate();
         }
     },
@@ -38,11 +47,20 @@ const Bullet = new Phaser.Class({
     },
 });
 
+const ShipBullet = new Phaser.Class({
+    Extends: Bullet,
+    direction: 1,
+    outOfScene() {
+        return this.y > game.config.height;
+    },
+});
+
 function preload() {
     this.load.image('hero', 'src/assets/space_ship.png');
     this.load.image('sky', 'src/assets/sky23.png');
     this.load.image('rocketShot', 'src/assets/rocketShot.png');
     this.load.spritesheet('ship', 'src/assets/starblast_ship_gray.png', { frameWidth: 28, frameHeight: 14 });
+    this.load.spritesheet('chargedShip', 'src/assets/starblast_ship_charged.png', { frameWidth: 28, frameHeight: 14 });
     this.load.spritesheet('boom', 'src/assets/blast-vector-gif-animation-16.png', {
         frameWidth: 400,
         frameHeight: 288,
@@ -95,23 +113,37 @@ function create() {
     const eventConfig = {
         delay: 1000,
         callback: () => {
-            const ship = new Phaser.GameObjects.Sprite(this, 50 + Math.random() * 700, -50, 'ship');
+            const speed = Math.random();
+            const charged = Math.random() > 0.6;
+            const ship = new Phaser.GameObjects.Sprite(
+                this,
+                50 + Math.random() * 700,
+                -50,
+                charged ? 'chargedShip' : 'ship'
+            );
             this.add.existing(ship);
             ship.setRotation(Math.PI);
-            ship.anims.play('ship_fire');
+            ship.anims.play(charged ? 'charged_ship_fire' : 'ship_fire');
             this.ships.add(ship);
             ship.setScale(2);
-            const speed = Math.random();
-            ship.body.velocity.y = (MIN_SHIP_SPEED + speed * (MAX_SHIP_SPEED - MIN_SHIP_SPEED)) * speedMultiplier;
             ship.setData('speed', speed);
+            ship.setData('charged', charged);
+            ship.body.velocity.y = (MIN_SHIP_SPEED + speed * (MAX_SHIP_SPEED - MIN_SHIP_SPEED)) * speedMultiplier;
             this.time.addEvent({ ...eventConfig, delay: 750 + Math.random() * 750 });
         },
     };
     this.time.addEvent(eventConfig);
 
     this.ammo = this.physics.add.group();
+
     this.bullets = this.physics.add.group({
         classType: Bullet,
+        maxSize: 30,
+        runChildUpdate: true,
+    });
+
+    this.shipBullets = this.physics.add.group({
+        classType: ShipBullet,
         maxSize: 30,
         runChildUpdate: true,
     });
@@ -130,8 +162,8 @@ function create() {
     };
 
     const destroyShip = (ship) => {
-        if (ship.getData('speed') > 0.6) {
-            putAmmo(ship.x, ship.y, ship.body.velocity.x, ship.body.velocity.y);
+        if (ship.getData('charged')) {
+            putAmmo(ship.x, ship.y, ship.body.velocity.x, ship.body.velocity.y / 2);
         }
         ship.destroy();
     };
@@ -187,9 +219,28 @@ function create() {
         }
     });
 
+    this.physics.add.overlap(this.player, this.shipBullets, (player, bullet) => {
+        if (bullet.active && player.visible) {
+            player.setVisible(false);
+            bullet.deactivate();
+
+            const boom = new Phaser.GameObjects.Sprite(this, player.x, player.y, 'boom');
+            this.add.existing(boom);
+            boom.anims.play('boom');
+            this.sound.play('heroBoom', { volume: 0.5 });
+        }
+    });
+
     this.anims.create({
         key: 'ship_fire',
         frames: this.anims.generateFrameNumbers('ship', { start: 0, end: 2 }),
+        frameRate: 10,
+        repeat: Infinity,
+    });
+
+    this.anims.create({
+        key: 'charged_ship_fire',
+        frames: this.anims.generateFrameNumbers('chargedShip', { start: 0, end: 2 }),
         frameRate: 10,
         repeat: Infinity,
     });
@@ -270,10 +321,34 @@ function update() {
         }
     });
 
+    this.shipBullets.children.each((bullet) => {
+        if (bullet.active) {
+            bullet.body.velocity.x += bulletVelocityStep * speedMultiplier * (bullet.body.velocity.x > 0 ? -1 : 1);
+            bullet.body.velocity.y += bulletVelocityStep * speedMultiplier * (bullet.body.velocity.y > 0 ? -1 : 1);
+        }
+    });
+
     this.ships.children.each((ship) => {
         if (ship.y - ship.displayHeight / 2 > this.game.config.height) {
             this.sound.play('missile', { volume: 0.2 + 0.5 * ship.getData('speed') });
             ship.destroy();
+        } else if (ship.getData('charged') && !ship.getData('shot')) {
+            const movesFromLeft =
+                ship.x < this.player.x &&
+                this.player.body.velocity.x < 0 &&
+                this.player.x - ship.x < 3 * this.player.displayWidth;
+            const movesFromRight =
+                ship.x > this.player.x &&
+                this.player.body.velocity.x > 0 &&
+                ship.x - this.player.x < 3 * this.player.displayWidth;
+            if (ship.y < this.player.y && (movesFromLeft || movesFromRight)) {
+                const bullet = this.shipBullets.get();
+                if (bullet) {
+                    this.sound.play('heroShot', { volume: 0.2 });
+                    bullet.fire(ship.x, ship.y, ship.body.velocity.x, ship.body.velocity.y);
+                    ship.setData('shot', true);
+                }
+            }
         }
     });
 
@@ -310,4 +385,4 @@ const config = {
 };
 
 // eslint-disable-next-line no-unused-vars
-const game = new Phaser.Game(config);
+game = new Phaser.Game(config);
