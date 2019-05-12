@@ -36,8 +36,8 @@ export default class ExplosionGroup extends SimpleAutoGroup {
         explosion.fire(
             (gameObject1.x + gameObject2.x) / 2,
             (gameObject1.y + gameObject2.y) / 2,
-            (gameObject1.body.velocity.x + gameObject2.body.velocity.x) / 2 / SLOW_DOWN_FACTOR,
-            (gameObject1.body.velocity.y + gameObject2.body.velocity.y) / 2 / SLOW_DOWN_FACTOR,
+            (gameObject1.body.velocity.x + gameObject2.body.velocity.x) / 2,
+            (gameObject1.body.velocity.y + gameObject2.body.velocity.y) / 2,
             extra
         );
     }
