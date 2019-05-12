@@ -152,5 +152,13 @@ export default class Main extends Phaser.Scene {
                 player.disableBody(true, true);
             }
         });
+
+        this.physics.add.overlap(this.bullets, this.shipBullets, (bullet1, bullet2) => {
+            if (bullet1.active && bullet2.active) {
+                this.explosions.bump(bullet1, bullet2);
+                deactivate(bullet1);
+                deactivate(bullet2);
+            }
+        });
     }
 }
