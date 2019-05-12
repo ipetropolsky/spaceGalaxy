@@ -4,6 +4,7 @@ module.exports = {
     plugins: ['prettier'],
     rules: {
         'prettier/prettier': ['error'],
+        'no-restricted-syntax': 'off',
     },
     settings: {
         'import/resolver': {
