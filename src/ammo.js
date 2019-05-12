@@ -30,13 +30,12 @@ export default class AmmoGroup extends AutoGroup {
         const activeAmmo = this.getFirstAlive();
         const rotation = activeAmmo ? activeAmmo.rotation : 0;
         const ammo = this.get();
-        ammo &&
-            ammo.put(
-                gameObject.x,
-                gameObject.y,
-                gameObject.body.velocity.x / SLOW_DOWN_FACTOR,
-                gameObject.body.velocity.y / SLOW_DOWN_FACTOR,
-                rotation
-            );
+        ammo.put(
+            gameObject.x,
+            gameObject.y,
+            gameObject.body.velocity.x / SLOW_DOWN_FACTOR,
+            gameObject.body.velocity.y / SLOW_DOWN_FACTOR,
+            rotation
+        );
     }
 }

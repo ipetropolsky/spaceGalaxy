@@ -32,14 +32,13 @@ export default class Player extends Phaser.Physics.Arcade.Image {
     }
 
     fire() {
-        if (!this.visible) {
+        if (!this.active) {
             return;
         }
         if (this.bulletsCount) {
-            this.onFire(() => {
-                this.scene.sound.play('shot', { volume: 0.2 });
-                this.changeBulletsCount(-1);
-            });
+            this.scene.sound.play('shot', { volume: 0.2 });
+            this.changeBulletsCount(-1);
+            this.onFire();
         } else {
             this.scene.sound.play('emptyGun', { volume: 0.5 });
         }

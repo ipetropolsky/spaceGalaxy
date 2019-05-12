@@ -4,6 +4,7 @@ import { SimpleAutoGroup } from './autoGroup';
 import { SHIP } from './layers';
 import { activate, checkDeadMembers } from './utils';
 
+const INITIAL_BULLETS_COUNT = 1;
 const MIN_SHIP_SPEED = 100;
 const MAX_SHIP_SPEED = 300;
 
@@ -27,6 +28,27 @@ export class Ship extends Phaser.Physics.Arcade.Sprite {
     outOfScreen() {
         return this.y - this.displayHeight / 2 > this.scene.game.config.height;
     }
+
+    changeBulletsCount(amount) {
+        this.bulletsCount += amount;
+    }
+
+    _fireEnabled = true;
+    fire() {
+        if (!this.bulletsCount || !this._fireEnabled) {
+            return false;
+        }
+        this.scene.sound.play('shot', { volume: 0.2 });
+        this.changeBulletsCount(-1);
+        this._fireEnabled = false;
+        this.scene.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                this._fireEnabled = true;
+            },
+        });
+        return true;
+    }
 }
 
 export default class ShipGroup extends SimpleAutoGroup {
@@ -41,7 +63,7 @@ export default class ShipGroup extends SimpleAutoGroup {
         const vx = 0;
         const vy = MIN_SHIP_SPEED + speed * (MAX_SHIP_SPEED - MIN_SHIP_SPEED);
 
-        const ship = new Ship(this.scene, x, y, charged ? 1 : 0);
+        const ship = new Ship(this.scene, x, y, charged ? INITIAL_BULLETS_COUNT : 0);
         this.add(ship);
 
         ship.start(x, y, vx, vy);
@@ -69,9 +91,8 @@ export default class ShipGroup extends SimpleAutoGroup {
                         this.target.body.velocity.x > 0 &&
                         ship.x - this.target.x < 3 * this.target.displayWidth;
                     if (ship.y < this.target.y && (movesFromLeft || movesFromRight)) {
-                        if (this.onFire(ship)) {
-                            this.scene.sound.play('shot', { volume: 0.2 });
-                            ship.bulletsCount -= 1;
+                        if (ship.fire()) {
+                            this.onFire(ship);
                         }
                     }
                 }

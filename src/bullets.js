@@ -37,7 +37,7 @@ export default class BulletGroup extends AutoGroup {
 
     fireFrom(gameObject) {
         const bullet = this.get();
-        bullet && bullet.fire(gameObject.x, gameObject.y, gameObject.body.velocity.x, gameObject.body.velocity.y);
-        return !!bullet;
+        bullet.setData('owner', gameObject);
+        bullet.fire(gameObject.x, gameObject.y, gameObject.body.velocity.x, gameObject.body.velocity.y);
     }
 }

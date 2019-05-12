@@ -71,8 +71,8 @@ export default class Main extends Phaser.Scene {
         });
 
         this.player = new Player(this, 400, 300);
-        this.player.onFire = (onSuccess) => {
-            this.bullets.fireFrom(this.player) && onSuccess();
+        this.player.onFire = () => {
+            this.bullets.fireFrom(this.player);
         };
 
         const eventConfig = {
@@ -95,7 +95,7 @@ export default class Main extends Phaser.Scene {
 
         this.ships.target = this.player;
         this.ships.onFire = (ship) => {
-            return this.shipBullets.fireFrom(ship);
+            this.shipBullets.fireFrom(ship);
         };
 
         const destroyShip = (ship) => {
@@ -114,10 +114,11 @@ export default class Main extends Phaser.Scene {
             }
         });
 
-        this.physics.add.overlap(this.player, this.ammo, (player, ammo) => {
-            if (player.active && ammo.active) {
+        this.physics.add.overlap([this.player, this.ships], this.ammo, (object1, object2) => {
+            if (object1.active && object2.active) {
+                const [ammo, player] = this.ammo.contains(object1) ? [object1, object2] : [object2, object1];
                 this.sound.play('ammo', { volume: 0.5 });
-                this.player.changeBulletsCount(+BULLETS_BONUS);
+                player.changeBulletsCount(+BULLETS_BONUS);
                 deactivate(ammo);
             }
         });
@@ -131,12 +132,15 @@ export default class Main extends Phaser.Scene {
             }
         });
 
-        this.physics.add.overlap(this.bullets, this.ships, (bullet, ship) => {
-            if (bullet.active && ship.active) {
-                this.explosions.blowUp(ship);
-                this.player.changeShipsCount(+1);
-                deactivate(bullet);
-                destroyShip(ship);
+        this.physics.add.overlap([this.bullets, this.shipBullets], this.ships, (object1, object2) => {
+            if (object1.active && object2.active) {
+                const [ship, bullet] = this.ships.contains(object1) ? [object1, object2] : [object2, object1];
+                if (bullet.getData('owner') !== ship) {
+                    this.explosions.blowUp(ship);
+                    this.player.changeShipsCount(+1);
+                    deactivate(bullet);
+                    destroyShip(ship);
+                }
             }
         });
 

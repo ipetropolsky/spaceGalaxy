@@ -28,19 +28,17 @@ export default class ExplosionGroup extends SimpleAutoGroup {
 
     blowUp(gameObject, extra = {}) {
         const explosion = this.get();
-        explosion &&
-            explosion.fire(gameObject.x, gameObject.y, gameObject.body.velocity.x, gameObject.body.velocity.y, extra);
+        explosion.fire(gameObject.x, gameObject.y, gameObject.body.velocity.x, gameObject.body.velocity.y, extra);
     }
 
     bump(gameObject1, gameObject2, extra = {}) {
         const explosion = this.get();
-        explosion &&
-            explosion.fire(
-                (gameObject1.x + gameObject2.x) / 2,
-                (gameObject1.y + gameObject2.y) / 2,
-                (gameObject1.body.velocity.x + gameObject2.body.velocity.x) / 2 / SLOW_DOWN_FACTOR,
-                (gameObject1.body.velocity.y + gameObject2.body.velocity.y) / 2 / SLOW_DOWN_FACTOR,
-                extra
-            );
+        explosion.fire(
+            (gameObject1.x + gameObject2.x) / 2,
+            (gameObject1.y + gameObject2.y) / 2,
+            (gameObject1.body.velocity.x + gameObject2.body.velocity.x) / 2 / SLOW_DOWN_FACTOR,
+            (gameObject1.body.velocity.y + gameObject2.body.velocity.y) / 2 / SLOW_DOWN_FACTOR,
+            extra
+        );
     }
 }
