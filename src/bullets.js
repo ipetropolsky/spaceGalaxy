@@ -3,14 +3,15 @@ import Phaser from 'phaser';
 import AutoGroup from './autoGroup';
 import { BULLET } from './layers';
 import { activate, leadToZero } from './utils';
+import LevelManager from './levelManager';
 
-const DEFAULT_SPEED = Phaser.Math.GetSpeed(400, 1);
 const VELOCITY_STEP_DOWN = 3;
 
 export class Bullet extends Phaser.Physics.Arcade.Image {
     constructor(scene, x, y) {
         super(scene, x, y, 'rocket');
-        this.speed = DEFAULT_SPEED;
+        const level = LevelManager.getLevel();
+        this.speed = Phaser.Math.GetSpeed(level.bulletSpeed, 1);
     }
 
     fire(x, y, vx, vy) {

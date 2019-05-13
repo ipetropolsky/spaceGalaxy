@@ -1,17 +1,18 @@
 import Phaser from 'phaser';
 
 import { SHIP } from './layers';
-import { BULLETS_COUNT, SHIPS_COUNT } from './scenes/info';
+import { BULLETS_COUNT, SHIPS_COUNT, APPLES_COUNT } from './scenes/info';
 import { leadToZero } from './utils';
+import LevelManager from './levelManager';
 
 const VELOCITY_MAX = 300;
 const VELOCITY_STEP_UP = 10;
 const VELOCITY_STEP_DOWN = VELOCITY_STEP_UP * 0.5;
-const INITIAL_BULLETS_COUNT = 10;
 
 export default class Player extends Phaser.Physics.Arcade.Image {
     bulletsCount = 0;
     shipsCount = 0;
+    applesCount = 0;
 
     constructor(scene, x, y) {
         super(scene, x, y, 'hero');
@@ -22,8 +23,10 @@ export default class Player extends Phaser.Physics.Arcade.Image {
         this.setCollideWorldBounds(true);
         this.body.setMaxVelocity(VELOCITY_MAX);
 
-        this.changeBulletsCount(+INITIAL_BULLETS_COUNT);
+        const level = LevelManager.getLevel();
+        this.changeBulletsCount(+level.playerInitialBullets);
         this.changeShipsCount(0);
+        this.changeApplesCount(0);
 
         this.cursors = scene.input.keyboard.createCursorKeys();
         scene.input.keyboard.on('keydown-SPACE', () => {
@@ -32,7 +35,8 @@ export default class Player extends Phaser.Physics.Arcade.Image {
     }
 
     fire() {
-        if (!this.active) {
+        const level = LevelManager.getLevel();
+        if (!this.active || !level.playerCanFire) {
             return;
         }
         if (this.bulletsCount) {
@@ -52,6 +56,11 @@ export default class Player extends Phaser.Physics.Arcade.Image {
     changeShipsCount(amount) {
         this.shipsCount += amount;
         this.scene.registry.set(SHIPS_COUNT, this.shipsCount);
+    }
+
+    changeApplesCount(amount) {
+        this.applesCount += amount;
+        this.scene.registry.set(APPLES_COUNT, this.applesCount);
     }
 
     preUpdate() {

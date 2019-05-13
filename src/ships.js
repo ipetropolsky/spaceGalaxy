@@ -3,22 +3,20 @@ import Phaser from 'phaser';
 import { SimpleAutoGroup } from './autoGroup';
 import { SHIP } from './layers';
 import { activate, checkDeadMembers } from './utils';
-
-const INITIAL_BULLETS_COUNT = 1;
-const MIN_SHIP_SPEED = 100;
-const MAX_SHIP_SPEED = 300;
+import LevelManager from './levelManager';
 
 export class Ship extends Phaser.Physics.Arcade.Sprite {
     bulletsCount = 0;
 
-    constructor(scene, x, y, bulletsCount = 0) {
-        super(scene, x, y, bulletsCount ? 'shipWithAmmo' : 'ship');
+    constructor(scene, x, y, bulletsCount = null) {
+        const charged = typeof bulletsCount === 'number';
+        super(scene, x, y, 'ship');
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setScale(2);
         this.setRotation(Math.PI);
-        this.anims.play(bulletsCount ? 'shipWithAmmoFire' : 'shipFire');
-        this.bulletsCount = bulletsCount;
+        this.anims.play(charged ? 'shipWithAmmoFire' : 'shipFire');
+        this.bulletsCount = bulletsCount || 0;
     }
 
     start(x, y, vx, vy) {
@@ -42,7 +40,7 @@ export class Ship extends Phaser.Physics.Arcade.Sprite {
         this.changeBulletsCount(-1);
         this._fireEnabled = false;
         this.scene.time.addEvent({
-            delay: 1000,
+            delay: LevelManager.getLevel().shipShotDelay,
             callback: () => {
                 this._fireEnabled = true;
             },
@@ -55,22 +53,25 @@ export default class ShipGroup extends SimpleAutoGroup {
     classType = Ship;
     depth = SHIP;
 
-    createRandom(charged) {
-        const speed = Math.random();
-
-        const x = 50 + Math.random() * (this.scene.game.config.width - 100);
-        const y = -50;
-        const vx = 0;
-        const vy = MIN_SHIP_SPEED + speed * (MAX_SHIP_SPEED - MIN_SHIP_SPEED);
-
-        const ship = new Ship(this.scene, x, y, charged ? INITIAL_BULLETS_COUNT : 0);
+    create(x, y, vx, vy, speed, bulletsCount = null) {
+        const charged = typeof bulletsCount === 'number';
+        const ship = new Ship(this.scene, x, y, bulletsCount);
         this.add(ship);
-
         ship.start(x, y, vx, vy);
         ship.setData('speed', speed);
         ship.setData('charged', charged);
-
         return ship;
+    }
+
+    createRandom() {
+        const level = LevelManager.getLevel();
+        const charged = Math.random() > 1 - level.shipWithAmmoRatio;
+        const speed = Math.random();
+        const x = 50 + Math.random() * (this.scene.game.config.width - 100);
+        const y = -50;
+        const vx = 0;
+        const vy = level.shipMinSpeed + speed * (level.shipMaxSpeed - level.shipMinSpeed);
+        return this.create(x, y, vx, vy, speed, charged ? level.shipWithAmmoInitialBullets : null);
     }
 
     onDeactivate(ship) {
@@ -80,8 +81,12 @@ export default class ShipGroup extends SimpleAutoGroup {
     preUpdate() {
         checkDeadMembers(this);
         if (this.target && this.target.active) {
+            const level = LevelManager.getLevel();
             this.children.each((ship) => {
-                if (ship.active && ship.bulletsCount) {
+                const shipCanFire =
+                    (ship.getData('charged') && level.shipWithAmmoCanFire) ||
+                    (!ship.getData('charged') && level.shipCanFire);
+                if (ship.active && shipCanFire && ship.bulletsCount) {
                     const movesFromLeft =
                         ship.x < this.target.x &&
                         this.target.body.velocity.x < 0 &&
