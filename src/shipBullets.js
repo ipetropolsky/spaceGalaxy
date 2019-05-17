@@ -11,10 +11,6 @@ class ShipBullet extends Bullet {
         this.speed = Phaser.Math.GetSpeed(level.shipBulletSpeed, 1);
     }
 
-    outOfScreen() {
-        return this.y - this.displayHeight / 2 > this.scene.game.config.height;
-    }
-
     preUpdate(time, delta) {
         this.y += this.speed * delta;
     }

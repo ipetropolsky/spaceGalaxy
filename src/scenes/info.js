@@ -15,7 +15,7 @@ export default class Info extends Phaser.Scene {
         this.load.image('rocketIcon', 'src/assets/rocket.png');
         this.load.spritesheet('shipIcon', 'src/assets/ship.png', { frameWidth: 28, frameHeight: 14 });
         this.load.spritesheet('fullscreen', 'src/assets/fullscreen.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.image('coin', 'src/assets/apple.png');
+        this.load.image('appleIcon', 'src/assets/apple.png');
     }
 
     create() {
@@ -28,7 +28,7 @@ export default class Info extends Phaser.Scene {
         this.add.image(screenWidth - 65, 26, 'shipIcon');
         this.shipsText = this.add.text(screenWidth - 45, 16, '', { fontSize: '20px', fill: '#fff' });
 
-        this.add.image(125, 24, 'coin');
+        this.add.image(125, 24, 'appleIcon');
         this.applesText = this.add.text(142, 16, '0', { fontSize: '20px', fill: '#fff' });
 
         this.registry.events.on('changedata', this.updateData);

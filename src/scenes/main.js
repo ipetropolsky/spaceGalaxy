@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 import AmmoGroup from '../ammo';
+import AppleGroup from '../apples';
 import BulletGroup from '../bullets';
 import ExplosionGroup from '../explosions';
 import Player from '../player';
@@ -200,16 +201,11 @@ export default class Main extends Phaser.Scene {
             }
         });
 
-        const apples = this.physics.add.group();
+        this.apples = new AppleGroup(this.physics.world, this);
         const eventConfigForApples = {
             delay: 1000,
             callback: () => {
-                const apple = this.physics.add.sprite(Phaser.Math.RND.between(50, 750), -20, 'apple');
-                apple.setScale(1.5);
-                apple.setRotation((Phaser.Math.RND.between(-30, 30) * Math.PI) / 180);
-                apples.add(apple, true);
-                apple.setAngularVelocity(Phaser.Math.RND.between(80, 120));
-                apple.body.velocity.y = Phaser.Math.RND.between(100, 300);
+                this.apples.createRandom();
                 this.time.addEvent({
                     callback: eventConfigForApples.callback,
                     delay: Phaser.Math.RND.integerInRange(2000, 3000),
@@ -218,15 +214,17 @@ export default class Main extends Phaser.Scene {
         };
         this.time.addEvent(eventConfigForApples);
 
-        this.physics.add.overlap([this.player, this.ships], apples, (ship, apple) => {
-            if (this.ships.contains(ship)) {
-                this.sound.play('collectLovely', { volume: 0.2 });
-                ship.anims.play(ship.getData('charged') ? 'shipWithAmmoRainbowFire' : 'shipRainbowFire');
-            } else {
-                this.sound.play('collectRetro', { volume: 0.4 });
-                ship.changeApplesCount(+1);
+        this.physics.add.overlap([this.player, this.ships], this.apples, (ship, apple) => {
+            if (apple.getData('owner') !== ship) {
+                if (this.ships.contains(ship)) {
+                    this.sound.play('collectLovely', { volume: 0.2 });
+                    ship.anims.play(ship.getData('charged') ? 'shipWithAmmoRainbowFire' : 'shipRainbowFire');
+                } else {
+                    this.sound.play('collectRetro', { volume: 0.4 });
+                    ship.changeApplesCount(+1);
+                }
+                deactivate(apple);
             }
-            apple.destroy();
         });
 
         this.cameras.main.fadeIn(1000);

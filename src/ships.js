@@ -23,10 +23,6 @@ export class Ship extends Phaser.Physics.Arcade.Sprite {
         activate(this, x, y, vx, vy);
     }
 
-    outOfScreen() {
-        return this.y - this.displayHeight / 2 > this.scene.game.config.height;
-    }
-
     changeBulletsCount(amount) {
         this.bulletsCount += amount;
     }

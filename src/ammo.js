@@ -16,10 +16,6 @@ class Ammo extends Phaser.Physics.Arcade.Image {
         this.body.setAngularVelocity(100);
         this.rotation = rotation;
     }
-
-    outOfScreen() {
-        return this.y - this.displayHeight / 2 > this.scene.game.config.height;
-    }
 }
 
 export default class AmmoGroup extends AutoGroup {

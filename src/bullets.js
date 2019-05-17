@@ -25,10 +25,6 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
             this.body.velocity.y = leadToZero(this.body.velocity.y, VELOCITY_STEP_DOWN);
         }
     }
-
-    outOfScreen() {
-        return this.y < -this.displayHeight / 2;
-    }
 }
 
 export default class BulletGroup extends AutoGroup {

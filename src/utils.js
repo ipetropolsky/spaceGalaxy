@@ -9,9 +9,20 @@ export const deactivate = (gameObject) => {
     }
 };
 
+const WORLD_PADDING = 100;
+export const outOfScreen = (gameObject) => {
+    if (gameObject.outOfScreen) {
+        return gameObject.outOfScreen();
+    }
+    return (
+        gameObject.y + gameObject.displayHeight / 2 < -WORLD_PADDING ||
+        gameObject.y - gameObject.displayHeight / 2 > gameObject.scene.game.config.height + WORLD_PADDING
+    );
+};
+
 export const checkDeadMembers = (group) => {
     group.getChildren().forEach((member) => {
-        if (member.active && member.outOfScreen()) {
+        if (member.active && outOfScreen(member)) {
             group.onDeactivate && group.onDeactivate(member);
             deactivate(member);
         }
