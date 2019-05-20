@@ -5,11 +5,11 @@ import { BULLETS_COUNT, SHIPS_COUNT, APPLES_COUNT } from './scenes/info';
 import { leadToZero } from './utils';
 import LevelManager from './levelManager';
 
-const VELOCITY_MAX = 300;
+const VELOCITY_MAX = 350;
 const VELOCITY_STEP_UP = 10;
 const VELOCITY_STEP_DOWN = VELOCITY_STEP_UP * 0.5;
 
-export default class Player extends Phaser.Physics.Arcade.Image {
+export default class Player extends Phaser.Physics.Arcade.Sprite {
     bulletsCount = 0;
     shipsCount = 0;
     applesCount = 0;
@@ -19,6 +19,8 @@ export default class Player extends Phaser.Physics.Arcade.Image {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setDepth(SHIP);
+        this.body.setSize(23, 31);
+        this.body.setOffset(0, 1);
         this.setScale(2, 2);
         this.setCollideWorldBounds(true);
         this.body.setMaxVelocity(VELOCITY_MAX);
@@ -64,20 +66,29 @@ export default class Player extends Phaser.Physics.Arcade.Image {
     }
 
     preUpdate() {
+        super.preUpdate.apply(this, arguments);
+        let frame = 1;
+
         if (this.cursors.left.isDown) {
             this.body.velocity.x -= VELOCITY_STEP_UP;
+            frame += 3;
         } else if (this.cursors.right.isDown) {
             this.body.velocity.x += VELOCITY_STEP_UP;
+            frame += 6;
         } else if (this.body.velocity.x) {
             this.body.velocity.x = leadToZero(this.body.velocity.x, VELOCITY_STEP_DOWN);
         }
 
         if (this.cursors.up.isDown) {
             this.body.velocity.y -= VELOCITY_STEP_UP;
+            frame -= 1;
         } else if (this.cursors.down.isDown) {
             this.body.velocity.y += VELOCITY_STEP_UP;
+            frame += 1;
         } else if (this.body.velocity.y) {
             this.body.velocity.y = leadToZero(this.body.velocity.y, VELOCITY_STEP_DOWN);
         }
+
+        this.setFrame(frame);
     }
 }

@@ -17,9 +17,15 @@ export default class Main extends Phaser.Scene {
 
     preload() {
         this.load.image('apple', 'src/assets/apple.png');
-        this.load.image('hero', 'src/assets/hero.png');
+        this.load.spritesheet('hero', 'src/assets/hero.png', {
+            frameWidth: 23,
+            frameHeight: 33,
+        });
         this.load.image('rocket', 'src/assets/rocket.png');
-        this.load.spritesheet('ship', 'src/assets/ship.png', { frameWidth: 28, frameHeight: 14 });
+        this.load.spritesheet('ship', 'src/assets/ship.png', {
+            frameWidth: 28,
+            frameHeight: 14,
+        });
         this.load.spritesheet('blowUp', 'src/assets/blowUp.png', {
             frameWidth: 400,
             frameHeight: 288,

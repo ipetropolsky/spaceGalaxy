@@ -5,6 +5,7 @@ module.exports = {
     rules: {
         'prettier/prettier': ['error'],
         'no-restricted-syntax': 'off',
+        'prefer-rest-params': 'off',
     },
     settings: {
         'import/resolver': {
