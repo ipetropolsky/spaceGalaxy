@@ -1,5 +1,7 @@
 import DefaultLevel from './default';
 
-export default class Level1 extends DefaultLevel {
-    name = 'Level 1';
-}
+const Level1 = {
+    ...DefaultLevel,
+};
+
+export default Level1;

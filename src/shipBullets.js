@@ -2,17 +2,15 @@ import Phaser from 'phaser';
 
 import BulletGroup, { Bullet } from './bullets';
 import LevelManager from './levelManager';
+import { activate } from './utils';
 
 class ShipBullet extends Bullet {
-    constructor(scene, x, y) {
-        super(scene, x, y);
-        this.setRotation(Math.PI);
+    fire(x, y, vx, vy) {
         const level = LevelManager.getLevel();
-        this.speed = Phaser.Math.GetSpeed(level.shipBulletSpeed, 1);
-    }
-
-    preUpdate(time, delta) {
-        this.y += this.speed * delta;
+        activate(this, x, y, vx, vy + (this.up ? -1 : 1) * level.shipBulletVelocity);
+        this.setAcceleration(0, (this.up ? -1 : 1) * level.shipBulletAcceleration);
+        this.setRotation(Math.PI);
+        this.setDamping(true);
     }
 }
 

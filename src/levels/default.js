@@ -1,21 +1,17 @@
-export default class DefaultLevel {
-    name = 'default';
+import { SlowPlayer } from './player';
+import { NoCannon } from './cannon';
+import { BaseAmmo } from './ammo';
+import { SlowShip } from './ships';
+import { SilentChargedShip } from './chargedShips';
+import { SlowShipFactory } from './shipFactory';
 
-    shipCanFire = false;
-    shipMinSpeed = 100;
-    shipMaxSpeed = 300;
-    shipThrowsAmmo = false;
-    shipWithAmmoRatio = 0;
-    shipWithAmmoCanFire = false;
-    shipWithAmmoInitialBullets = 0;
-    shipShotDelay = 1000;
-    shipFactoryDelayMin = 750;
-    shipFactoryDelayMax = 1500;
+const DefaultLevel = {
+    ...SlowPlayer,
+    ...NoCannon,
+    ...BaseAmmo,
+    ...SlowShip,
+    ...SilentChargedShip,
+    ...SlowShipFactory,
+};
 
-    bulletSpeed = 400;
-    shipBulletSpeed = 400;
-
-    playerCanFire = false;
-    playerInitialBullets = 10;
-    bulletsInAmmo = 2;
-}
+export default DefaultLevel;

@@ -21,6 +21,10 @@ export default class Main extends Phaser.Scene {
             frameWidth: 23,
             frameHeight: 33,
         });
+        this.load.spritesheet('strokeHero', 'src/assets/strokeHero.png', {
+            frameWidth: 35,
+            frameHeight: 45,
+        });
         this.load.image('rocket', 'src/assets/rocket.png');
         this.load.spritesheet('ship', 'src/assets/ship.png', {
             frameWidth: 28,
@@ -55,6 +59,9 @@ export default class Main extends Phaser.Scene {
         this.load.audio('collectLovely', 'src/assets/collectLovely.mp3', {
             instances: 3,
         });
+        this.load.audio('defence', 'src/assets/defence.mp3', {
+            instances: 3,
+        });
     }
 
     create() {
@@ -66,15 +73,22 @@ export default class Main extends Phaser.Scene {
             if (this.player.applesCount) {
                 window.setTimeout(() => {
                     this.time.addEvent({
-                        delay: 50,
+                        delay: 40,
                         callback: () => {
-                            this.player.changeApplesCount(-1);
+                            this.player.changeApplesCount(-1, true);
                         },
                         repeat: this.player.applesCount - 1,
                     });
-                }, 2000 - 51 * this.player.applesCount);
+                }, 1500 - 45 * this.player.applesCount);
             }
         };
+
+        this.anims.create({
+            key: 'strokeHero',
+            frames: this.anims.generateFrameNumbers('strokeHero', { start: 0, end: 5 }),
+            frameRate: 40,
+            repeat: 0,
+        });
 
         this.anims.create({
             key: 'shipFire',
@@ -84,7 +98,7 @@ export default class Main extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: 'shipWithAmmoFire',
+            key: 'chargedShipFire',
             frames: this.anims.generateFrameNumbers('ship', { start: 3, end: 5 }),
             frameRate: 10,
             repeat: Infinity,
@@ -98,7 +112,7 @@ export default class Main extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: 'shipWithAmmoRainbowFire',
+            key: 'chargedShipRainbowFire',
             frames: this.anims.generateFrameNumbers('ship', { start: 9, end: 11 }),
             frameRate: 10,
             repeat: Infinity,
@@ -141,8 +155,7 @@ export default class Main extends Phaser.Scene {
         };
 
         const destroyShip = (ship) => {
-            const level = LevelManager.getLevel();
-            if (level.shipThrowsAmmo && ship.getData('charged')) {
+            if (ship.getData('charged')) {
                 this.ammo.putFrom(ship);
             }
             ship.destroy();
@@ -191,11 +204,21 @@ export default class Main extends Phaser.Scene {
 
         this.physics.add.overlap(this.player, this.shipBullets, (player, bullet) => {
             if (bullet.active && player.active) {
-                this.explosions.blowUp(player, { silent: true });
-                this.sound.play('blowUpHero', { volume: 0.5 });
-                deactivate(bullet);
-                player.disableBody(true, true);
-                restartGame();
+                if (this.player.applesCount > 0) {
+                    this.player.body.setVelocity(
+                        this.player.body.velocity.x,
+                        this.player.body.velocity.y + bullet.body.velocity.y / 2
+                    );
+                    deactivate(bullet);
+                    this.player.hit();
+                    this.player.changeApplesCount(-1);
+                } else {
+                    this.explosions.blowUp(player, { silent: true });
+                    this.sound.play('blowUpHero', { volume: 0.5 });
+                    deactivate(bullet);
+                    player.disableBody(true, true);
+                    restartGame();
+                }
             }
         });
 
@@ -224,10 +247,18 @@ export default class Main extends Phaser.Scene {
             if (apple.getData('owner') !== ship) {
                 if (this.ships.contains(ship)) {
                     this.sound.play('collectLovely', { volume: 0.2 });
-                    ship.anims.play(ship.getData('charged') ? 'shipWithAmmoRainbowFire' : 'shipRainbowFire');
+                    ship.anims.play(ship.getData('charged') ? 'chargedShipRainbowFire' : 'shipRainbowFire');
                 } else {
                     this.sound.play('collectRetro', { volume: 0.4 });
                     ship.changeApplesCount(+1);
+                    if (ship.applesCount === 10) {
+                        LevelManager.setLevel(1);
+                        this.player.updateLevel();
+                    }
+                    if (ship.applesCount === 20) {
+                        LevelManager.setLevel(2);
+                        this.player.updateLevel();
+                    }
                 }
                 deactivate(apple);
             }

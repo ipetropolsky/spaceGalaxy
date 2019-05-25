@@ -1,13 +1,16 @@
 import Level1 from './levels/level1';
+import Level2 from './levels/level2';
+import Level3 from './levels/level3';
 
 const LevelManager = (function() {
-    const levels = [new Level1()];
+    const levels = [Level1, Level2, Level3];
     let currentLevel = 0;
 
     return {
         getIndex: () => currentLevel,
         getLevel: () => levels[currentLevel],
         setLevel: (index) => {
+            console.log('setLevel ' + index);
             currentLevel = index;
         },
         nextLevel: () => {
