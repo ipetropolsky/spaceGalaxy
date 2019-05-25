@@ -9,10 +9,13 @@ import ShipBulletGroup from '../shipBullets';
 import ShipGroup from '../ships';
 import { deactivate } from '../utils';
 import LevelManager from '../levelManager';
+import { SHIP_APPLES_COUNT, SHIP_HERO_COUNT, SHIPS_COUNT } from './info';
 
 export default class Main extends Phaser.Scene {
     constructor() {
         super('main');
+        this.shipHeroCount = 0;
+        this.shipApplesCount = 0;
     }
 
     preload() {
@@ -167,6 +170,8 @@ export default class Main extends Phaser.Scene {
                 this.sound.play('blowUpHero', { volume: 0.5 });
                 destroyShip(ship);
                 player.disableBody(true, true);
+                this.registry.set(SHIP_HERO_COUNT, ++this.shipHeroCount);
+                this.scene.get('info').animateCounter(SHIP_HERO_COUNT);
                 restartGame();
             }
         });
@@ -216,6 +221,8 @@ export default class Main extends Phaser.Scene {
                     this.explosions.blowUp(player, { silent: true });
                     this.sound.play('blowUpHero', { volume: 0.5 });
                     deactivate(bullet);
+                    this.registry.set(SHIP_HERO_COUNT, ++this.shipHeroCount);
+                    this.scene.get('info').animateCounter(SHIP_HERO_COUNT);
                     player.disableBody(true, true);
                     restartGame();
                 }
@@ -248,6 +255,8 @@ export default class Main extends Phaser.Scene {
                 if (this.ships.contains(ship)) {
                     this.sound.play('collectLovely', { volume: 0.2 });
                     ship.anims.play(ship.getData('charged') ? 'chargedShipRainbowFire' : 'shipRainbowFire');
+                    this.registry.set(SHIP_APPLES_COUNT, ++this.shipApplesCount);
+                    this.scene.get('info').animateCounter(SHIP_APPLES_COUNT);
                 } else {
                     this.sound.play('collectRetro', { volume: 0.4 });
                     ship.changeApplesCount(+1);
@@ -264,6 +273,8 @@ export default class Main extends Phaser.Scene {
             }
         });
 
+        this.registry.set(SHIP_APPLES_COUNT, this.shipApplesCount);
+        this.registry.set(SHIP_HERO_COUNT, this.shipHeroCount);
         this.cameras.main.fadeIn(1000);
     }
 }
