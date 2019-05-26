@@ -11,10 +11,11 @@ class Ammo extends Phaser.Physics.Arcade.Image {
         super(scene, x, y, 'rocket');
     }
 
-    put(x, y, vx, vy, rotation) {
+    put(x, y, vx, vy, rotation, count) {
         activate(this, x, y, vx, vy);
         this.body.setAngularVelocity(100);
         this.rotation = rotation;
+        this.setData('count', count);
     }
 }
 
@@ -22,7 +23,7 @@ export default class AmmoGroup extends AutoGroup {
     classType = Ammo;
     depth = BULLET;
 
-    putFrom(gameObject) {
+    putFrom(gameObject, count) {
         const activeAmmo = this.getFirstAlive();
         const rotation = activeAmmo ? activeAmmo.rotation : 0;
         const ammo = this.get();
@@ -31,7 +32,8 @@ export default class AmmoGroup extends AutoGroup {
             gameObject.y,
             gameObject.body.velocity.x / SLOW_DOWN_FACTOR,
             gameObject.body.velocity.y / SLOW_DOWN_FACTOR,
-            rotation
+            rotation,
+            count
         );
     }
 }

@@ -1,9 +1,10 @@
 import Level1 from './levels/level1';
 import Level2 from './levels/level2';
 import Level3 from './levels/level3';
+import Level4 from './levels/level4';
 
 const LevelManager = (function() {
-    const levels = [Level1, Level2, Level3];
+    const levels = [Level1, Level2, Level3, Level4];
     let currentLevel = 0;
 
     return {

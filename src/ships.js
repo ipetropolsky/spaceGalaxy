@@ -1,64 +1,56 @@
-import Phaser from 'phaser';
-
+import BaseShip from './baseShip';
 import { SimpleAutoGroup } from './autoGroup';
 import { SHIP } from './layers';
-import { activate, checkDeadMembers } from './utils';
+import { checkDeadMembers } from './utils';
 import LevelManager from './levelManager';
 
-export class Ship extends Phaser.Physics.Arcade.Sprite {
-    bulletsCount = 0;
-    applesCount = 0;
+export class Ship extends BaseShip {
+    setDefaults() {
+        super.setDefaults();
+        this.rotation = Math.PI;
+        this.strokeTexture = 'strokeShip';
+        this.strokeAnimation = 'strokeShip';
+        this.speed = 0;
+    }
 
-    constructor(scene, x, y, bulletsCount = null) {
-        const charged = typeof bulletsCount === 'number';
+    constructor(scene, x, y) {
         super(scene, x, y, 'ship');
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
-
-        this.stroke = scene.physics.add
-            .sprite(x, y, 'strokeShip')
-            .setRotation(Math.PI)
-            .setScale(2, 2)
-            .setVisible(false);
-
-        this.setScale(2);
-        this.setRotation(Math.PI);
-        this.anims.play(charged ? 'chargedShipFire' : 'shipFire');
-        this.bulletsCount = bulletsCount || 0;
-        this.applesCount = 0;
     }
 
-    hit(gameObject) {
-        this.stroke.setVisible(true);
-        this.stroke.anims.play('strokeShip');
-        this.scene.sound.play('defence', { volume: 0.7 });
-        this.stroke.on('animationcomplete', () => {
-            this.stroke.setVisible(false);
-        });
-        this.body.velocity.y += gameObject.body.velocity.y / 2;
-    }
-
-    start(x, y, vx, vy) {
-        activate(this, x, y, vx, vy);
-        this.stroke.setPosition(x, y);
-        this.stroke.setVelocity(vx, vy);
-    }
-
-    changeBulletsCount(amount) {
-        this.bulletsCount += amount;
-    }
-
-    changeApplesCount(amount) {
-        this.applesCount += amount;
-    }
-
-    _fireEnabled = true;
-    fire() {
-        if (!this.bulletsCount || !this._fireEnabled) {
-            return false;
+    setApplesCount(value) {
+        const prevHasApples = this.applesCount > 0;
+        super.setApplesCount(value);
+        const hasApples = this.applesCount > 0;
+        if (hasApples !== prevHasApples) {
+            if (hasApples) {
+                this.anims.play(this.hasCannon ? 'chargedShipRainbowFire' : 'shipRainbowFire');
+            } else {
+                this.anims.play(this.hasCannon ? 'chargedShipFire' : 'shipFire');
+            }
         }
-        this.scene.sound.play('shot', { volume: 0.2 });
-        this.changeBulletsCount(-1);
+    }
+
+    start(x, y, vx, vy, hasCannon, speed) {
+        super.start(x, y, vx, vy, hasCannon);
+        this.speed = speed;
+        if (this.hasCannon) {
+            this.setTexture('chargedShip');
+            this.anims.play('chargedShipFire');
+            const level = LevelManager.getLevel();
+            this.setBulletsCount(level.chargedShipInitialBullets);
+        } else {
+            this.setTexture('ship');
+            this.anims.play('shipFire');
+        }
+        // Для выравнивания скорости после столкновений
+        this.setTargetVelocity(vx, vy);
+    }
+
+    fireEnabled() {
+        return super.fireEnabled() && LevelManager.getLevel().shipCanFire;
+    }
+
+    applyFireDelay() {
         this._fireEnabled = false;
         this.scene.time.addEvent({
             delay: LevelManager.getLevel().shipShotDelay,
@@ -66,13 +58,6 @@ export class Ship extends Phaser.Physics.Arcade.Sprite {
                 this._fireEnabled = true;
             },
         });
-        return true;
-    }
-
-    preUpdate() {
-        super.preUpdate.apply(this, arguments);
-        this.stroke.setPosition(this.x, this.y);
-        this.stroke.setVelocity(this.body.velocity.x, this.body.velocity.y);
     }
 }
 
@@ -80,40 +65,32 @@ export default class ShipGroup extends SimpleAutoGroup {
     classType = Ship;
     depth = SHIP;
 
-    create(x, y, vx, vy, speed, bulletsCount = null) {
-        const charged = typeof bulletsCount === 'number';
-        const ship = new Ship(this.scene, x, y, bulletsCount);
-        this.add(ship);
-        ship.start(x, y, vx, vy);
-        ship.setData('speed', speed);
-        ship.setData('charged', charged);
+    createOne(x, y, vx, vy, hasCannon, speed) {
+        const ship = this.get();
+        ship.start(x, y, vx, vy, hasCannon, speed);
         return ship;
     }
 
     createRandom() {
         const level = LevelManager.getLevel();
-        const charged = Math.random() > 1 - level.chargedShipRatio;
+        const hasCannon = Math.random() > 1 - level.chargedShipRatio;
         const speed = Math.random();
         const x = 50 + Math.random() * (this.scene.game.config.width - 100);
         const y = -50;
-        const vx = 0;
+        const vx = Math.random() * 2 * level.shipMaxVelocityX - level.shipMaxVelocityX;
         const vy = level.shipMinSpeed + speed * (level.shipMaxSpeed - level.shipMinSpeed);
-        return this.create(x, y, vx, vy, speed, charged ? level.chargedShipInitialBullets : null);
+        return this.createOne(x, y, vx, vy, hasCannon, speed);
     }
 
     onDeactivate(ship) {
-        this.scene.sound.play('missile', { volume: 0.2 + 0.5 * ship.getData('speed') });
+        this.scene.sound.play('missile', { volume: 0.2 + 0.5 * ship.speed });
     }
 
     preUpdate() {
         checkDeadMembers(this);
         if (this.target && this.target.active) {
-            const level = LevelManager.getLevel();
             this.children.each((ship) => {
-                const shipCanFire =
-                    (ship.getData('charged') && level.chargedShipCanFire) ||
-                    (!ship.getData('charged') && level.shipCanFire);
-                if (ship.active && shipCanFire && ship.bulletsCount) {
+                if (ship.active && ship.fireEnabled() && ship.bulletsCount) {
                     const movesFromLeft =
                         ship.x < this.target.x &&
                         this.target.body.velocity.x < 0 &&
@@ -123,9 +100,8 @@ export default class ShipGroup extends SimpleAutoGroup {
                         this.target.body.velocity.x > 0 &&
                         ship.x - this.target.x < 3 * this.target.displayWidth;
                     if (ship.y < this.target.y && (movesFromLeft || movesFromRight)) {
-                        if (ship.fire()) {
-                            this.onFire(ship);
-                        }
+                        ship.fire();
+                        this.onFire(ship);
                     }
                 }
             });

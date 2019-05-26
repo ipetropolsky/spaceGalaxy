@@ -1,5 +1,5 @@
 export const SilentChargedShip = {
-    chargedShipCanFire: false,
+    shipCanFire: false,
     chargedShipInitialBullets: 1,
     shipShotDelay: 1000,
     shipBulletVelocity: 0,
@@ -7,7 +7,7 @@ export const SilentChargedShip = {
 };
 
 export const BaseChargedShip = {
-    chargedShipCanFire: true,
+    shipCanFire: true,
     chargedShipInitialBullets: 1,
     shipShotDelay: 1000,
     shipBulletVelocity: 300,
@@ -15,7 +15,7 @@ export const BaseChargedShip = {
 };
 
 export const QuickChargedShip = {
-    chargedShipCanFire: true,
+    shipCanFire: true,
     chargedShipInitialBullets: 2,
     shipShotDelay: 1000,
     shipBulletVelocity: 500,

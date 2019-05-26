@@ -30,5 +30,8 @@ export const checkDeadMembers = (group) => {
 };
 
 export const leadTo = (targetValue, value, step) => {
-    return value + step * (value > targetValue ? -1 : 1);
+    if (value > targetValue) {
+        return Math.max(value - step, targetValue);
+    }
+    return Math.min(value + step, targetValue);
 };

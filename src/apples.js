@@ -24,7 +24,6 @@ export default class AppleGroup extends AutoGroup {
 
     createOne(x, y, vx, vy) {
         const apple = this.get();
-        apple.setData('owner', null);
         apple.put(x, y, vx, vy);
         return apple;
     }
