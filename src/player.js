@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 
 import { SHIP } from './layers';
 import { BULLETS_COUNT, SHIPS_COUNT, APPLES_COUNT } from './scenes/info';
-import { deactivate, leadToZero } from './utils';
+import { leadTo } from './utils';
 import LevelManager from './levelManager';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
@@ -39,13 +39,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
-    hit() {
+    hit(gameObject) {
         this.stroke.setVisible(true);
         this.stroke.anims.play('strokeHero');
         this.scene.sound.play('defence', { volume: 0.7 });
         this.stroke.on('animationcomplete', () => {
             this.stroke.setVisible(false);
         });
+        this.body.velocity.y += gameObject.body.velocity.y / 2;
     }
 
     fire() {
@@ -98,7 +99,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.body.velocity.x += level.playerVelocityStepUp;
             frame += 6;
         } else if (this.body.velocity.x) {
-            this.body.velocity.x = leadToZero(this.body.velocity.x, level.playerVelocityStepDown);
+            this.body.velocity.x = leadTo(0, this.body.velocity.x, level.playerVelocityStepDown);
         }
 
         if (this.cursors.up.isDown) {
@@ -108,7 +109,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.body.velocity.y += level.playerVelocityStepUp;
             frame += 1;
         } else if (this.body.velocity.y) {
-            this.body.velocity.y = leadToZero(this.body.velocity.y, level.playerVelocityStepDown);
+            this.body.velocity.y = leadTo(0, this.body.velocity.y, level.playerVelocityStepDown);
         }
 
         this.setFrame(frame);

@@ -29,6 +29,6 @@ export const checkDeadMembers = (group) => {
     });
 };
 
-export const leadToZero = (velocity, step) => {
-    return velocity + step * (velocity > 0 ? -1 : 1);
+export const leadTo = (targetValue, value, step) => {
+    return value + step * (value > targetValue ? -1 : 1);
 };

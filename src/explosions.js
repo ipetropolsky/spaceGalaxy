@@ -7,8 +7,8 @@ import { activate, deactivate } from './utils';
 const SLOW_DOWN_FACTOR = 2;
 
 class Explosion extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y) {
-        super(scene, x, y, 'blowUp');
+    constructor(scene, x, y, texture = 'blowUp') {
+        super(scene, x, y, texture);
     }
 
     fire(x, y, vx, vy, extra = { silent: false }) {
@@ -17,8 +17,16 @@ class Explosion extends Phaser.Physics.Arcade.Sprite {
         this.on('animationcomplete', () => {
             deactivate(this);
         });
+        this.playAnimation();
+        extra.silent || this.playSound();
+    }
+
+    playAnimation() {
         this.anims.play('blowUp');
-        extra.silent || this.scene.sound.play('blowUp', { volume: 0.5 });
+    }
+
+    playSound() {
+        this.scene.sound.play('blowUp', { volume: 0.5 });
     }
 }
 
@@ -41,4 +49,18 @@ export default class ExplosionGroup extends SimpleAutoGroup {
             extra
         );
     }
+}
+
+class Explosion2 extends Explosion {
+    constructor(scene, x, y) {
+        super(scene, x, y, 'blowUp2');
+    }
+
+    playAnimation() {
+        this.anims.play('blowUp2');
+    }
+}
+
+export class ExplosionGroup2 extends ExplosionGroup {
+    classType = Explosion2;
 }

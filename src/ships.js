@@ -7,24 +7,49 @@ import LevelManager from './levelManager';
 
 export class Ship extends Phaser.Physics.Arcade.Sprite {
     bulletsCount = 0;
+    applesCount = 0;
 
     constructor(scene, x, y, bulletsCount = null) {
         const charged = typeof bulletsCount === 'number';
         super(scene, x, y, 'ship');
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
+        this.stroke = scene.physics.add
+            .sprite(x, y, 'strokeShip')
+            .setRotation(Math.PI)
+            .setScale(2, 2)
+            .setVisible(false);
+
         this.setScale(2);
         this.setRotation(Math.PI);
         this.anims.play(charged ? 'chargedShipFire' : 'shipFire');
         this.bulletsCount = bulletsCount || 0;
+        this.applesCount = 0;
+    }
+
+    hit(gameObject) {
+        this.stroke.setVisible(true);
+        this.stroke.anims.play('strokeShip');
+        this.scene.sound.play('defence', { volume: 0.7 });
+        this.stroke.on('animationcomplete', () => {
+            this.stroke.setVisible(false);
+        });
+        this.body.velocity.y += gameObject.body.velocity.y / 2;
     }
 
     start(x, y, vx, vy) {
         activate(this, x, y, vx, vy);
+        this.stroke.setPosition(x, y);
+        this.stroke.setVelocity(vx, vy);
     }
 
     changeBulletsCount(amount) {
         this.bulletsCount += amount;
+    }
+
+    changeApplesCount(amount) {
+        this.applesCount += amount;
     }
 
     _fireEnabled = true;
@@ -42,6 +67,12 @@ export class Ship extends Phaser.Physics.Arcade.Sprite {
             },
         });
         return true;
+    }
+
+    preUpdate() {
+        super.preUpdate.apply(this, arguments);
+        this.stroke.setPosition(this.x, this.y);
+        this.stroke.setVelocity(this.body.velocity.x, this.body.velocity.y);
     }
 }
 
