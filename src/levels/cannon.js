@@ -8,7 +8,7 @@ export const NoCannon = {
 export const BaseCannon = {
     playerCanFire: true,
     playerInitialBullets: 10,
-    bulletVelocity: 300,
+    bulletVelocity: 400,
     bulletAcceleration: 200,
 };
 

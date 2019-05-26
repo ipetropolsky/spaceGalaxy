@@ -45,6 +45,7 @@ export default class Player extends BaseShip {
     updateLevel() {
         const level = LevelManager.getLevel();
         this.body.setMaxVelocity(level.playerVelocityMax);
+        this.hasCannon = level.playerCanFire;
     }
 
     userControl() {

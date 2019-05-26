@@ -14,6 +14,8 @@ export default class Sky extends Phaser.Scene {
     create() {
         this.sky = this.add.tileSprite(400, 300, 1920, 2156, 'sky');
         this.sky.setScale(0.42);
+
+        this.cameras.main.fadeIn(1000);
     }
 
     update() {

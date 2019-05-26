@@ -2,8 +2,8 @@ export const SlowShipFactory = {
     shipFactoryDelayMin: 1000,
     shipFactoryDelayMax: 2000,
     chargedShipRatio: 0,
-    shipMinSpeed: 75,
-    shipMaxSpeed: 150,
+    shipMinSpeed: 100,
+    shipMaxSpeed: 200,
     shipMaxVelocityX: 0,
 };
 
@@ -12,7 +12,7 @@ export const BaseShipFactory = {
     shipFactoryDelayMax: 1500,
     chargedShipRatio: 0.33,
     shipMinSpeed: 100,
-    shipMaxSpeed: 200,
+    shipMaxSpeed: 250,
     shipMaxVelocityX: 0,
 };
 
@@ -22,6 +22,7 @@ export const QuickShipFactory = {
     chargedShipRatio: 0.67,
     shipMinSpeed: 150,
     shipMaxSpeed: 300,
+    shipMaxVelocityX: 50,
 };
 
 export const DiagonalShipFactory = {

@@ -1,5 +1,5 @@
 export const SlowPlayer = {
-    playerVelocityMax: 200,
+    playerVelocityMax: 250,
     playerVelocityStepUp: 8,
     playerVelocityStepDown: 4,
 };

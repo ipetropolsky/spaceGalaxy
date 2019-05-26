@@ -69,6 +69,8 @@ export default class Info extends Phaser.Scene {
                 yoyo: true,
             });
         });
+
+        this.cameras.main.fadeIn(1000);
     }
 
     animateCounter = (key) => {
