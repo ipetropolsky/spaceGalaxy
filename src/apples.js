@@ -34,7 +34,7 @@ export default class AppleGroup extends AutoGroup {
         const x = 50 + Math.random() * (this.scene.game.config.width - 100);
         const y = -50;
         const vx = 0;
-        const vy = level.shipMinSpeed + speed * (level.shipMaxSpeed - level.shipMinSpeed);
+        const vy = level.appleMinSpeed + speed * (level.appleMaxSpeed - level.appleMinSpeed);
         return this.createOne(x, y, vx, vy);
     }
 }

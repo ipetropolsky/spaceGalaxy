@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 import { DEFAULT } from './layers';
-import { checkDeadMembers } from './utils';
+import { updateMembers } from './utils';
 
 export class SimpleAutoGroup extends Phaser.Physics.Arcade.Group {
     classType = Phaser.Physics.Arcade.Image;
@@ -16,6 +16,6 @@ export class SimpleAutoGroup extends Phaser.Physics.Arcade.Group {
 
 export default class AutoGroup extends SimpleAutoGroup {
     preUpdate() {
-        checkDeadMembers(this);
+        updateMembers(this);
     }
 }

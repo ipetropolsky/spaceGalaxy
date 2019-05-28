@@ -1,11 +1,15 @@
+import LevelManager from './levelManager';
+
 export const activate = (gameObject, x, y, vx, vy) => {
     gameObject.enableBody(true, x, y, true, true);
     gameObject.body.setVelocity(vx, vy);
+    gameObject.onActivate && gameObject.onActivate();
 };
 
 export const deactivate = (gameObject) => {
     if (gameObject.active) {
         gameObject.disableBody(true, true);
+        gameObject.onDeactivate && gameObject.onDeactivate();
     }
 };
 
@@ -20,8 +24,17 @@ export const outOfScreen = (gameObject) => {
     );
 };
 
-export const checkDeadMembers = (group) => {
+export const updateMembers = (group) => {
+    const level = LevelManager.getLevel();
     group.getChildren().forEach((member) => {
+        if (group.lightSource) {
+            if (member.active) {
+                const tint = level.luminosity(member, group.lightSource);
+                member.setTint(tint);
+            } else {
+                member.clearTint();
+            }
+        }
         if (member.active && outOfScreen(member)) {
             group.onDeactivate && group.onDeactivate(member);
             deactivate(member);

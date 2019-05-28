@@ -10,6 +10,7 @@ export class Bullet extends Phaser.Physics.Arcade.Image {
         super(scene, x, y, 'rocket');
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        this.setTint(0x000000);
     }
 
     fire(x, y, vx, vy) {

@@ -35,7 +35,11 @@ export default class Main extends Phaser.Scene {
         this.load.image('rocket', 'src/assets/rocket.png');
         this.load.spritesheet('ship', 'src/assets/ship.png', {
             frameWidth: 28,
-            frameHeight: 14,
+            frameHeight: 9,
+        });
+        this.load.spritesheet('shipFlame', 'src/assets/shipFlame.png', {
+            frameWidth: 4,
+            frameHeight: 5,
         });
         this.load.spritesheet('blowUp', 'src/assets/blowUp.png', {
             frameWidth: 400,
@@ -76,6 +80,9 @@ export default class Main extends Phaser.Scene {
     }
 
     create() {
+        const level = LevelManager.getLevel();
+        LevelManager.setLevel(this, level ? level.index : 0, true);
+
         const restartGame = () => {
             this.cameras.main.on('camerafadeoutcomplete', () => {
                 this.scene.restart();
@@ -109,29 +116,15 @@ export default class Main extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: 'shipFire',
-            frames: this.anims.generateFrameNumbers('ship', { start: 0, end: 2 }),
+            key: 'shipFlame',
+            frames: this.anims.generateFrameNumbers('shipFlame', { start: 0, end: 2 }),
             frameRate: 10,
             repeat: Infinity,
         });
 
         this.anims.create({
-            key: 'chargedShipFire',
-            frames: this.anims.generateFrameNumbers('ship', { start: 3, end: 5 }),
-            frameRate: 10,
-            repeat: Infinity,
-        });
-
-        this.anims.create({
-            key: 'shipRainbowFire',
-            frames: this.anims.generateFrameNumbers('ship', { start: 6, end: 8 }),
-            frameRate: 10,
-            repeat: Infinity,
-        });
-
-        this.anims.create({
-            key: 'chargedShipRainbowFire',
-            frames: this.anims.generateFrameNumbers('ship', { start: 9, end: 11 }),
+            key: 'shipRainbowFlame',
+            frames: this.anims.generateFrameNumbers('shipFlame', { start: 3, end: 5 }),
             frameRate: 10,
             repeat: Infinity,
         });
@@ -193,9 +186,10 @@ export default class Main extends Phaser.Scene {
             delay: 1000,
             callback: () => {
                 this.apples.createRandom();
+                const level = LevelManager.getLevel();
                 this.time.addEvent({
                     callback: eventConfigForApples.callback,
-                    delay: Phaser.Math.RND.integerInRange(2000, 3000),
+                    delay: Phaser.Math.RND.integerInRange(level.appleFactoryDelayMin, level.appleFactoryDelayMax),
                 });
             },
         };
@@ -211,6 +205,12 @@ export default class Main extends Phaser.Scene {
         this.ships.onFire = (ship) => {
             this.shipBullets.fireFrom(ship);
         };
+
+        this.apples.lightSource = this.player;
+        this.bullets.lightSource = this.player;
+        this.shipBullets.lightSource = this.player;
+        this.ammo.lightSource = this.player;
+        this.ships.lightSource = this.player;
 
         const putAmmo = (ship) => {
             if (ship.bulletsCount) {
@@ -310,19 +310,6 @@ export default class Main extends Phaser.Scene {
                 if (this.ships.contains(ship)) {
                     this.registry.set(SHIP_APPLES_COUNT, ++this.shipApplesCount);
                     this.scene.get('info').animateCounter(SHIP_APPLES_COUNT);
-                } else {
-                    if (ship.applesCount === 10 && LevelManager.getIndex() < 1) {
-                        LevelManager.setLevel(1);
-                        this.player.updateLevel();
-                    }
-                    if (ship.applesCount === 20 && LevelManager.getIndex() < 2) {
-                        LevelManager.setLevel(2);
-                        this.player.updateLevel();
-                    }
-                    if (ship.applesCount === 30 && LevelManager.getIndex() < 3) {
-                        LevelManager.setLevel(3);
-                        this.player.updateLevel();
-                    }
                 }
                 deactivate(apple);
             }
@@ -332,5 +319,22 @@ export default class Main extends Phaser.Scene {
         this.registry.set(SHIP_HERO_COUNT, this.shipHeroCount);
 
         this.cameras.main.fadeIn(1000);
+    }
+
+    update() {
+        super.update.call(this, arguments);
+
+        const totalLevels = LevelManager.getLevels().length;
+        const level = LevelManager.getLevel();
+        if (level.finished()) {
+            console.log(`Level ${level.index} cleared!`);
+            if (level.index + 1 < totalLevels) {
+                LevelManager.setLevel(this, level.index + 1);
+                this.player.updateLevel();
+            } else {
+                console.log('Game over!');
+                LevelManager.setLevel(this, 0);
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 import BaseShip from './baseShip';
 import { SimpleAutoGroup } from './autoGroup';
 import { SHIP } from './layers';
-import { checkDeadMembers } from './utils';
+import { updateMembers } from './utils';
 import LevelManager from './levelManager';
 
 export class Ship extends BaseShip {
@@ -15,6 +15,17 @@ export class Ship extends BaseShip {
 
     constructor(scene, x, y) {
         super(scene, x, y, 'ship');
+        this.flame = scene.physics.add
+            .sprite(x, y - 5, 'shipFlame')
+            .setOrigin(0.5, 0)
+            .setDepth(SHIP)
+            .setRotation(this.rotation)
+            .setScale(this.scale);
+    }
+
+    updateFlamePosition() {
+        this.flame.setPosition(this.x, this.y - this.height);
+        this.flame.setVelocity(this.body.velocity.x, this.body.velocity.y);
     }
 
     setApplesCount(value) {
@@ -22,28 +33,36 @@ export class Ship extends BaseShip {
         super.setApplesCount(value);
         const hasApples = this.applesCount > 0;
         if (hasApples !== prevHasApples) {
-            if (hasApples) {
-                this.anims.play(this.hasCannon ? 'chargedShipRainbowFire' : 'shipRainbowFire');
-            } else {
-                this.anims.play(this.hasCannon ? 'chargedShipFire' : 'shipFire');
-            }
+            this.updateLook();
+        }
+    }
+
+    updateLook() {
+        if (this.applesCount > 0) {
+            this.setFrame(this.hasCannon ? 3 : 2);
+            this.flame.anims.play('shipRainbowFlame');
+        } else {
+            this.setFrame(this.hasCannon ? 1 : 0);
+            this.flame.anims.play('shipFlame');
         }
     }
 
     start(x, y, vx, vy, hasCannon, speed) {
         super.start(x, y, vx, vy, hasCannon);
+        this.flame.setVisible(true);
+        this.updateFlamePosition();
         this.speed = speed;
         if (this.hasCannon) {
-            this.setTexture('chargedShip');
-            this.anims.play('chargedShipFire');
             const level = LevelManager.getLevel();
             this.setBulletsCount(level.chargedShipInitialBullets);
-        } else {
-            this.setTexture('ship');
-            this.anims.play('shipFire');
         }
+        this.updateLook();
         // Для выравнивания скорости после столкновений
         this.setTargetVelocity(vx, vy);
+    }
+
+    onDeactivate() {
+        this.flame.setVisible(false);
     }
 
     fireEnabled() {
@@ -58,6 +77,11 @@ export class Ship extends BaseShip {
                 this._fireEnabled = true;
             },
         });
+    }
+
+    preUpdate() {
+        super.preUpdate.apply(this, arguments);
+        this.updateFlamePosition();
     }
 }
 
@@ -87,7 +111,7 @@ export default class ShipGroup extends SimpleAutoGroup {
     }
 
     preUpdate() {
-        checkDeadMembers(this);
+        updateMembers(this);
         if (this.target && this.target.active) {
             this.children.each((ship) => {
                 if (ship.active && ship.fireEnabled() && ship.bulletsCount) {
