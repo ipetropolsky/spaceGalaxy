@@ -2,7 +2,7 @@ import { GoalApples } from './goals';
 import { SlowPlayer } from './player';
 import { NoCannon } from './cannon';
 import { BaseAmmo } from './ammo';
-import { SilentChargedShip } from './chargedShips';
+import { ChargedShip } from './chargedShips';
 import { SlowShipFactory } from './shipFactory';
 import { SlowAppleFactory } from './appleFactory';
 import { Daylight } from './luminosity';
@@ -12,7 +12,7 @@ const DefaultLevel = {
     ...SlowPlayer,
     ...NoCannon,
     ...BaseAmmo,
-    ...SilentChargedShip,
+    ...ChargedShip,
     ...SlowShipFactory,
     ...SlowAppleFactory,
     ...Daylight,

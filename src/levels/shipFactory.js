@@ -22,9 +22,9 @@ export const QuickShipFactory = {
     chargedShipRatio: 0.67,
     shipMinSpeed: 150,
     shipMaxSpeed: 300,
-    shipMaxVelocityX: 50,
+    shipMaxVelocityX: 20,
 };
 
 export const DiagonalShipFactory = {
-    shipMaxVelocityX: 150,
+    shipMaxVelocityX: 100,
 };
