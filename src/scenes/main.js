@@ -19,7 +19,10 @@ export default class Main extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('apple', 'src/assets/apple.png');
+        this.load.spritesheet('apple', 'src/assets/appleSprite5deg.png', {
+            frameWidth: 28,
+            frameHeight: 28,
+        });
         this.load.spritesheet('hero', 'src/assets/hero.png', {
             frameWidth: 23,
             frameHeight: 33,
@@ -100,6 +103,13 @@ export default class Main extends Phaser.Scene {
                 }, 1500 - 45 * this.player.applesCount);
             }
         };
+
+        this.anims.create({
+            key: 'appleRotation',
+            frames: this.anims.generateFrameNumbers('apple', { start: 0, end: 71 }),
+            frameRate: 40,
+            repeat: -1,
+        });
 
         this.anims.create({
             key: 'strokeHero',

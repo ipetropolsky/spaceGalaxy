@@ -5,7 +5,7 @@ import { BULLET } from './layers';
 import { activate } from './utils';
 import LevelManager from './levelManager';
 
-class Apple extends Phaser.Physics.Arcade.Image {
+class Apple extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'apple');
     }
@@ -13,8 +13,7 @@ class Apple extends Phaser.Physics.Arcade.Image {
     put(x, y, vx, vy) {
         activate(this, x, y, vx, vy);
         this.setScale(1.5);
-        this.setRotation((Phaser.Math.RND.between(-30, 30) * Math.PI) / 180);
-        this.setAngularVelocity(Phaser.Math.RND.between(80, 120));
+        this.anims.play('appleRotation');
     }
 }
 
@@ -35,6 +34,8 @@ export default class AppleGroup extends AutoGroup {
         const y = -50;
         const vx = 0;
         const vy = level.appleMinSpeed + speed * (level.appleMaxSpeed - level.appleMinSpeed);
-        return this.createOne(x, y, vx, vy);
+        const apple = this.createOne(x, y, vx, vy);
+        apple.anims.setTimeScale(0.7 + 0.3 * speed);
+        return apple;
     }
 }
