@@ -7,6 +7,7 @@ import { SlowAppleFactory } from 'src/levels/appleFactory';
 import { Daylight } from 'src/levels/luminosity';
 
 const DefaultLevel = {
+    skySpeed: 1,
     ...GoalApples(10),
     ...SlowPlayer,
     ...NoCannon,

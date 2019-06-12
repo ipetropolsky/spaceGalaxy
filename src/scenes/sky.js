@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-const sceneSpeed = 1;
+import LevelManager from 'src/levelManager';
 
 export default class Sky extends Phaser.Scene {
     constructor() {
@@ -19,6 +19,8 @@ export default class Sky extends Phaser.Scene {
     }
 
     update() {
-        this.sky.tilePositionY -= sceneSpeed;
+        const level = LevelManager.getLevel();
+        const skySpeed = (level && level.skySpeed) || 1;
+        this.sky.tilePositionY -= skySpeed;
     }
 }

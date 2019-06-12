@@ -6,15 +6,15 @@ export const SlowAppleFactory = {
 };
 
 export const BaseAppleFactory = {
-    appleFactoryDelayMin: 3000,
-    appleFactoryDelayMax: 2000,
+    appleFactoryDelayMin: 2500,
+    appleFactoryDelayMax: 3500,
     appleMinSpeed: 150,
     appleMaxSpeed: 250,
 };
 
 export const QuickAppleFactory = {
     appleFactoryDelayMin: 2000,
-    appleFactoryDelayMax: 1000,
+    appleFactoryDelayMax: 3000,
     appleMinSpeed: 200,
     appleMaxSpeed: 300,
 };
