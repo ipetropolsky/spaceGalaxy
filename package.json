@@ -1,12 +1,12 @@
 {
-  "name": "game1",
+  "name": "spaceGalaxy",
   "private": true,
   "version": "1.0.0",
-  "description": "Game 1",
+  "description": "Space Galaxy game",
   "main": "src/index.js",
   "scripts": {
-    "build": "webpack --config webpack/prod.js ",
-    "start": "webpack-dev-server --config webpack/base.js --open",
+    "build": "webpack --config webpack/prod.js",
+    "start": "webpack-dev-server --config webpack/dev.js",
     "postinstall": "ln -sf `pwd`/githooks/* .git/hooks/"
   },
   "devDependencies": {
@@ -17,6 +17,7 @@
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
     "clean-webpack-plugin": "^1.0.0",
+    "copy-webpack-plugin": "^5.0.3",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-import-resolver-webpack": "^0.11.1",

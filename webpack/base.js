@@ -1,11 +1,23 @@
 const webpack = require('webpack');
 const path = require('path');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const { rootPath, distPath } = require('./constants');
 
 module.exports = {
-    mode: 'development',
-    devtool: 'eval-source-map',
+    entry: {
+        app: path.join(rootPath, 'src', 'index.js'),
+    },
+    output: {
+        path: distPath,
+        filename: 'bundle.min.js',
+    },
+    resolve: {
+        modules: [rootPath, 'node_modules'],
+    },
     module: {
         rules: [
             {
@@ -26,15 +38,21 @@ module.exports = {
         ],
     },
     plugins: [
-        new CleanWebpackPlugin(['dist'], {
-            root: path.resolve(__dirname, '../'),
+        new CleanWebpackPlugin([distPath], {
+            root: rootPath,
         }),
         new webpack.DefinePlugin({
             CANVAS_RENDERER: JSON.stringify(true),
             WEBGL_RENDERER: JSON.stringify(true),
         }),
         new HtmlWebpackPlugin({
-            template: './index.html',
+            template: path.join(rootPath, 'index.html'),
         }),
+        new CopyWebpackPlugin([
+            {
+                from: path.join(rootPath, 'assets', '**', '*'),
+                to: distPath,
+            },
+        ]),
     ],
 };
