@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 
-import { SimpleAutoGroup } from './autoGroup';
-import { BULLET } from './layers';
-import { activate, deactivate } from './utils';
+import { SimpleAutoGroup } from 'src/autoGroup';
+import { BULLET } from 'src/layers';
+import { activate, deactivate } from 'src/utils';
 
 const SLOW_DOWN_FACTOR = 2;
 

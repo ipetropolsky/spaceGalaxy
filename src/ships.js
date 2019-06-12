@@ -1,8 +1,8 @@
-import BaseShip from './baseShip';
-import { SimpleAutoGroup } from './autoGroup';
-import { SHIP } from './layers';
-import { updateMembers } from './utils';
-import LevelManager from './levelManager';
+import BaseShip from 'src/baseShip';
+import { SimpleAutoGroup } from 'src/autoGroup';
+import { SHIP } from 'src/layers';
+import { updateMembers } from 'src/utils';
+import LevelManager from 'src/levelManager';
 
 export class Ship extends BaseShip {
     setDefaults() {

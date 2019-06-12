@@ -1,5 +1,7 @@
-import { activate, deactivate, leadTo } from './utils';
-import LevelManager from './levelManager';
+import Phaser from 'phaser';
+
+import { activate, leadTo } from 'src/utils';
+import LevelManager from 'src/levelManager';
 
 export default class BaseShip extends Phaser.Physics.Arcade.Sprite {
     setDefaults() {

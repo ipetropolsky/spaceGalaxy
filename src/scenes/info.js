@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 
-import makeFullScreenButton from '../fullscreen';
-import { APPLES, SHIPS, SECONDS } from '../levels/goals';
-import LevelManager from '../levelManager';
+import makeFullScreenButton from 'src/fullscreen';
+import { APPLES, SHIPS, SECONDS } from 'src/levels/goals';
+import LevelManager from 'src/levelManager';
 
 export const BULLETS_COUNT = 'bulletsCount';
 export const SHIPS_COUNT = 'shipsCount';
@@ -17,12 +17,12 @@ export default class Info extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('rocketIcon', 'src/assets/rocket.png');
-        this.load.spritesheet('shipIcon', 'src/assets/ship.png', { frameWidth: 28, frameHeight: 9 });
-        this.load.spritesheet('heroIcon', 'src/assets/hero.png', { frameWidth: 23, frameHeight: 33 });
-        this.load.spritesheet('fullscreen', 'src/assets/fullscreen.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.image('appleIcon', 'src/assets/apple.png');
-        this.load.image('timeIcon', 'src/assets/hourglass.png');
+        this.load.image('rocketIcon', 'assets/rocket.png');
+        this.load.spritesheet('shipIcon', 'assets/ship.png', { frameWidth: 28, frameHeight: 9 });
+        this.load.spritesheet('heroIcon', 'assets/hero.png', { frameWidth: 23, frameHeight: 33 });
+        this.load.spritesheet('fullscreen', 'assets/fullscreen.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.image('appleIcon', 'assets/apple.png');
+        this.load.image('timeIcon', 'assets/hourglass.png');
     }
 
     create() {

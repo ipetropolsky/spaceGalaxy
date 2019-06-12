@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 
-import SceneBoot from './scenes/boot';
-import SceneInfo from './scenes/info';
-import SceneMain from './scenes/main';
-import SceneSky from './scenes/sky';
+import SceneBoot from 'src/scenes/boot';
+import SceneInfo from 'src/scenes/info';
+import SceneMain from 'src/scenes/main';
+import SceneSky from 'src/scenes/sky';
 
 const config = {
     type: Phaser.AUTO,

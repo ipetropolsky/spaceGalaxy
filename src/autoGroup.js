@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
-import { DEFAULT } from './layers';
-import { updateMembers } from './utils';
+import { DEFAULT } from 'src/layers';
+import { updateMembers } from 'src/utils';
 
 export class SimpleAutoGroup extends Phaser.Physics.Arcade.Group {
     classType = Phaser.Physics.Arcade.Image;

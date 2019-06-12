@@ -1,11 +1,11 @@
-import Level1 from './level1';
-import { BasePlayer } from './player';
-import { BaseCannon } from './cannon';
-import { BaseChargedShip, SilentChargedShipModifier } from './chargedShips';
-import { BaseShipFactory } from './shipFactory';
-import { BaseAppleFactory } from './appleFactory';
-import { Dusk } from './luminosity';
-import { GoalShips, GoalSeconds } from './goals';
+import Level1 from 'src/levels/level1';
+import { BasePlayer } from 'src/levels/player';
+import { BaseCannon } from 'src/levels/cannon';
+import { BaseChargedShip, SilentChargedShipModifier } from 'src/levels/chargedShips';
+import { BaseShipFactory } from 'src/levels/shipFactory';
+import { BaseAppleFactory } from 'src/levels/appleFactory';
+import { Dusk } from 'src/levels/luminosity';
+import { GoalShips, GoalSeconds } from 'src/levels/goals';
 
 const Level2 = {
     ...Level1,

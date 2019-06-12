@@ -1,8 +1,8 @@
-import Level3 from './level3';
-import { DiagonalShipFactory } from './shipFactory';
-import { SilentChargedShipModifier } from './chargedShips';
-import { Dusk } from './luminosity';
-import { GoalSeconds, GoalApples } from './goals';
+import Level3 from 'src/levels/level3';
+import { DiagonalShipFactory } from 'src/levels/shipFactory';
+import { SilentChargedShipModifier } from 'src/levels/chargedShips';
+import { Dusk } from 'src/levels/luminosity';
+import { GoalSeconds, GoalApples } from 'src/levels/goals';
 
 const Level4 = {
     ...Level3,

@@ -1,7 +1,7 @@
-import DefaultLevel from './default';
-import { Dusk } from './luminosity';
-import { GoalApples } from './goals';
-import { BaseCannon } from './cannon';
+import DefaultLevel from 'src/levels/default';
+import { Dusk } from 'src/levels/luminosity';
+import { GoalApples } from 'src/levels/goals';
+import { BaseCannon } from 'src/levels/cannon';
 
 const Level1 = {
     ...DefaultLevel,

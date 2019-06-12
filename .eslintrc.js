@@ -6,6 +6,9 @@ module.exports = {
         'prettier/prettier': ['error'],
         'no-restricted-syntax': 'off',
         'prefer-rest-params': 'off',
+        'class-methods-use-this': 'off',
+        'no-plusplus': 'off',
+        'no-console': 'off',
     },
     settings: {
         'import/resolver': {
@@ -13,5 +16,6 @@ module.exports = {
                 config: './webpack/base.js',
             },
         },
+        'import/extensions': ['.js'],
     },
 };

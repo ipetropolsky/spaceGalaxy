@@ -1,10 +1,10 @@
-import Level2 from './level2';
-import { QuickPlayer } from './player';
-import { QuickCannon } from './cannon';
-import { QuickChargedShip, BaseChargedShip } from './chargedShips';
-import { QuickShipFactory } from './shipFactory';
-import { Dusk } from './luminosity';
-import { GoalShips, GoalApples } from './goals';
+import Level2 from 'src/levels/level2';
+import { QuickPlayer } from 'src/levels/player';
+import { QuickCannon } from 'src/levels/cannon';
+import { QuickChargedShip, BaseChargedShip } from 'src/levels/chargedShips';
+import { QuickShipFactory } from 'src/levels/shipFactory';
+import { Dusk } from 'src/levels/luminosity';
+import { GoalShips, GoalApples } from 'src/levels/goals';
 
 const Level3 = {
     ...Level2,

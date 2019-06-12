@@ -1,4 +1,4 @@
-import { APPLES_COUNT, SHIPS_COUNT } from '../scenes/info';
+import { APPLES_COUNT, SHIPS_COUNT } from 'src/scenes/info';
 
 export const APPLES = 'APPLES';
 export const SHIPS = 'SHIPS';
@@ -9,7 +9,7 @@ export const GoalNothing = () => false;
 export const GoalApples = (count) => ({
     goalType: APPLES,
     goalParam: count,
-    finished: function() {
+    finished() {
         return this.scene.registry.get(APPLES_COUNT) - this.startApples >= count;
     },
 });
@@ -17,7 +17,7 @@ export const GoalApples = (count) => ({
 export const GoalShips = (count) => ({
     goalType: SHIPS,
     goalParam: count,
-    finished: function() {
+    finished() {
         return this.scene.registry.get(SHIPS_COUNT) - this.startShips >= count;
     },
 });
@@ -25,7 +25,7 @@ export const GoalShips = (count) => ({
 export const GoalSeconds = (count) => ({
     goalType: SECONDS,
     goalParam: count,
-    finished: function() {
+    finished() {
         return this.scene.time.now - this.startTime >= count * 1000;
     },
 });

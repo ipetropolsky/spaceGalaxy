@@ -1,8 +1,6 @@
-import Phaser from 'phaser';
-
-import BulletGroup, { Bullet } from './bullets';
-import LevelManager from './levelManager';
-import { activate } from './utils';
+import BulletGroup, { Bullet } from 'src/bullets';
+import LevelManager from 'src/levelManager';
+import { activate } from 'src/utils';
 
 class ShipBullet extends Bullet {
     fire(x, y, vx, vy) {

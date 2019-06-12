@@ -8,7 +8,7 @@ export default class Sky extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('sky', 'src/assets/sky.png');
+        this.load.image('sky', 'assets/sky.png');
     }
 
     create() {

@@ -1,6 +1,6 @@
-import BaseShip from './baseShip';
-import { SHIP } from './layers';
-import LevelManager from './levelManager';
+import BaseShip from 'src/baseShip';
+import { SHIP } from 'src/layers';
+import LevelManager from 'src/levelManager';
 
 export default class Player extends BaseShip {
     setDefaults() {

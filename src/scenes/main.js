@@ -1,14 +1,14 @@
 import Phaser from 'phaser';
 
-import AmmoGroup from '../ammo';
-import AppleGroup from '../apples';
-import BulletGroup from '../bullets';
-import ExplosionGroup, { ExplosionGroup2 } from '../explosions';
-import Player from '../player';
-import ShipBulletGroup from '../shipBullets';
-import ShipGroup from '../ships';
-import { deactivate } from '../utils';
-import LevelManager from '../levelManager';
+import AmmoGroup from 'src/ammo';
+import AppleGroup from 'src/apples';
+import BulletGroup from 'src/bullets';
+import ExplosionGroup, { ExplosionGroup2 } from 'src/explosions';
+import Player from 'src/player';
+import ShipBulletGroup from 'src/shipBullets';
+import ShipGroup from 'src/ships';
+import { deactivate } from 'src/utils';
+import LevelManager from 'src/levelManager';
 import { BULLETS_COUNT, APPLES_COUNT, SHIPS_COUNT, SHIP_APPLES_COUNT, SHIP_HERO_COUNT } from './info';
 
 export default class Main extends Phaser.Scene {
@@ -19,65 +19,65 @@ export default class Main extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet('apple', 'src/assets/appleSprite5deg.png', {
+        this.load.spritesheet('apple', 'assets/appleSprite5deg.png', {
             frameWidth: 28,
             frameHeight: 28,
         });
-        this.load.spritesheet('hero', 'src/assets/hero.png', {
+        this.load.spritesheet('hero', 'assets/hero.png', {
             frameWidth: 23,
             frameHeight: 33,
         });
-        this.load.spritesheet('strokeHero', 'src/assets/strokeHero.png', {
+        this.load.spritesheet('strokeHero', 'assets/strokeHero.png', {
             frameWidth: 35,
             frameHeight: 45,
         });
-        this.load.spritesheet('strokeShip', 'src/assets/strokeShip.png', {
+        this.load.spritesheet('strokeShip', 'assets/strokeShip.png', {
             frameWidth: 40,
             frameHeight: 32,
         });
-        this.load.image('rocket', 'src/assets/rocket.png');
-        this.load.spritesheet('ship', 'src/assets/ship.png', {
+        this.load.image('rocket', 'assets/rocket.png');
+        this.load.spritesheet('ship', 'assets/ship.png', {
             frameWidth: 28,
             frameHeight: 9,
         });
-        this.load.spritesheet('shipFlame', 'src/assets/shipFlame.png', {
+        this.load.spritesheet('shipFlame', 'assets/shipFlame.png', {
             frameWidth: 4,
             frameHeight: 5,
         });
-        this.load.spritesheet('blowUp', 'src/assets/blowUp.png', {
+        this.load.spritesheet('blowUp', 'assets/blowUp.png', {
             frameWidth: 400,
             frameHeight: 288,
         });
-        this.load.spritesheet('blowUp2', 'src/assets/blowUp2.png', {
+        this.load.spritesheet('blowUp2', 'assets/blowUp2.png', {
             frameWidth: 588,
             frameHeight: 288,
         });
 
-        this.load.audio('blowUpHero', 'src/assets/blowUpHero.mp3', {
+        this.load.audio('blowUpHero', 'assets/blowUpHero.mp3', {
             instances: 1,
         });
-        this.load.audio('blowUp', 'src/assets/blowUp.mp3', {
+        this.load.audio('blowUp', 'assets/blowUp.mp3', {
             instances: 3,
         });
-        this.load.audio('shot', 'src/assets/shot.mp3', {
+        this.load.audio('shot', 'assets/shot.mp3', {
             instances: 5,
         });
-        this.load.audio('emptyGun', 'src/assets/emptyGun.mp3', {
+        this.load.audio('emptyGun', 'assets/emptyGun.mp3', {
             instances: 3,
         });
-        this.load.audio('missile', 'src/assets/missile.mp3', {
+        this.load.audio('missile', 'assets/missile.mp3', {
             instances: 3,
         });
-        this.load.audio('ammo', 'src/assets/ammo.mp3', {
+        this.load.audio('ammo', 'assets/ammo.mp3', {
             instances: 3,
         });
-        this.load.audio('collectRetro', 'src/assets/collectRetro.mp3', {
+        this.load.audio('collectRetro', 'assets/collectRetro.mp3', {
             instances: 3,
         });
-        this.load.audio('collectLovely', 'src/assets/collectLovely.mp3', {
+        this.load.audio('collectLovely', 'assets/collectLovely.mp3', {
             instances: 3,
         });
-        this.load.audio('defence', 'src/assets/defence.mp3', {
+        this.load.audio('defence', 'assets/defence.mp3', {
             instances: 3,
         });
     }

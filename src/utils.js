@@ -1,4 +1,4 @@
-import LevelManager from './levelManager';
+import LevelManager from 'src/levelManager';
 
 export const activate = (gameObject, x, y, vx, vy) => {
     gameObject.enableBody(true, x, y, true, true);
