@@ -52,20 +52,20 @@ export default class Player extends BaseShip {
         const level = LevelManager.getLevel();
         let frame = 1;
 
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown && !this.cursors.right.isDown) {
             this.body.velocity.x -= level.playerVelocityStepUp;
             frame += 3;
-        } else if (this.cursors.right.isDown) {
+        } else if (!this.cursors.left.isDown && this.cursors.right.isDown) {
             this.body.velocity.x += level.playerVelocityStepUp;
             frame += 6;
         } else {
             this.correctVelocityX();
         }
 
-        if (this.cursors.up.isDown) {
+        if (this.cursors.up.isDown && !this.cursors.down.isDown) {
             this.body.velocity.y -= level.playerVelocityStepUp;
             frame -= 1;
-        } else if (this.cursors.down.isDown) {
+        } else if (!this.cursors.up.isDown && this.cursors.down.isDown) {
             this.body.velocity.y += level.playerVelocityStepUp;
             frame += 1;
         } else {
@@ -73,6 +73,11 @@ export default class Player extends BaseShip {
         }
 
         this.setFrame(frame);
+    }
+
+    hit() {
+        super.hit.apply(this, arguments);
+        this.updateStroke();
     }
 
     preUpdate() {

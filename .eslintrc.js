@@ -9,6 +9,7 @@ module.exports = {
         'class-methods-use-this': 'off',
         'no-plusplus': 'off',
         'no-console': 'off',
+        'import/prefer-default-export': 'off',
     },
     settings: {
         'import/resolver': {

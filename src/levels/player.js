@@ -15,3 +15,15 @@ export const QuickPlayer = {
     playerVelocityStepUp: 16,
     playerVelocityStepDown: 8,
 };
+
+export const SpeedyPlayer = {
+    playerVelocityMax: 450,
+    playerVelocityStepUp: 30,
+    playerVelocityStepDown: 15,
+};
+
+export const SuperPlayerModifier = ({ playerVelocityMax, playerVelocityStepUp, playerVelocityStepDown }) => ({
+    playerVelocityMax: Math.round(playerVelocityMax * 1.33),
+    playerVelocityStepUp: Math.round(playerVelocityStepUp * 1.33),
+    playerVelocityStepDown: Math.round(playerVelocityStepDown * 1.33),
+});

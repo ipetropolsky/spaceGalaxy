@@ -18,3 +18,15 @@ export const QuickAppleFactory = {
     appleMinSpeed: 200,
     appleMaxSpeed: 300,
 };
+
+export const SuperAppleFactoryModifier = ({
+    appleFactoryDelayMin,
+    appleFactoryDelayMax,
+    appleMinSpeed,
+    appleMaxSpeed,
+}) => ({
+    appleFactoryDelayMin: Math.round(appleFactoryDelayMin * 0.5),
+    appleFactoryDelayMax: Math.round(appleFactoryDelayMax * 0.5),
+    appleMinSpeed: Math.round(appleMinSpeed * 1.5),
+    appleMaxSpeed: Math.round(appleMaxSpeed * 1.5),
+});

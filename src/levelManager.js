@@ -1,7 +1,4 @@
-import Level1 from 'src/levels/level1';
-import Level2, { Level2Dark } from 'src/levels/level2';
-import Level3, { Level3Dark } from 'src/levels/level3';
-import Level4, { Level4Dark } from 'src/levels/level4';
+import { Level1, Level2, Level2Dark, Level3, Level3Dark, Level4, Level4Dark } from 'src/levels';
 import { APPLES_COUNT, SHIPS_COUNT } from 'src/scenes/info';
 
 const LevelManager = (function() {

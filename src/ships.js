@@ -47,14 +47,17 @@ export class Ship extends BaseShip {
         }
     }
 
-    start(x, y, vx, vy, hasCannon, speed) {
+    start(x, y, vx, vy, hasCannon, hasApples, speed) {
         super.start(x, y, vx, vy, hasCannon);
         this.flame.setVisible(true);
         this.updateFlamePosition();
         this.speed = speed;
-        if (this.hasCannon) {
-            const level = LevelManager.getLevel();
+        const level = LevelManager.getLevel();
+        if (hasCannon) {
             this.setBulletsCount(level.chargedShipInitialBullets);
+        }
+        if (hasApples) {
+            this.setApplesCount(level.rainbowShipInitialApples);
         }
         this.updateLook();
         // Для выравнивания скорости после столкновений
@@ -79,6 +82,11 @@ export class Ship extends BaseShip {
         });
     }
 
+    hit() {
+        super.hit.apply(this, arguments);
+        this.updateFlamePosition();
+    }
+
     preUpdate() {
         super.preUpdate.apply(this, arguments);
         this.updateFlamePosition();
@@ -89,21 +97,22 @@ export default class ShipGroup extends SimpleAutoGroup {
     classType = Ship;
     depth = SHIP;
 
-    createOne(x, y, vx, vy, hasCannon, speed) {
+    createOne(x, y, vx, vy, hasCannon, hasApples, speed) {
         const ship = this.get();
-        ship.start(x, y, vx, vy, hasCannon, speed);
+        ship.start(x, y, vx, vy, hasCannon, hasApples, speed);
         return ship;
     }
 
     createRandom() {
         const level = LevelManager.getLevel();
+        const hasApples = Math.random() > 1 - level.rainbowShipRatio;
         const hasCannon = Math.random() > 1 - level.chargedShipRatio;
         const speed = Math.random();
         const x = 50 + Math.random() * (this.scene.game.config.width - 100);
         const y = -50;
         const vx = Math.random() * 2 * level.shipMaxVelocityX - level.shipMaxVelocityX;
         const vy = level.shipMinSpeed + speed * (level.shipMaxSpeed - level.shipMinSpeed);
-        return this.createOne(x, y, vx, vy, hasCannon, speed);
+        return this.createOne(x, y, vx, vy, hasCannon, hasApples, speed);
     }
 
     onDeactivate(ship) {
