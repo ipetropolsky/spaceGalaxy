@@ -1,4 +1,4 @@
-import { APPLES_COUNT, SHIPS_COUNT } from 'src/scenes/info';
+import { APPLES_COUNT, SHIPS_COUNT } from 'src/registry';
 
 export const APPLES = 'APPLES';
 export const SHIPS = 'SHIPS';

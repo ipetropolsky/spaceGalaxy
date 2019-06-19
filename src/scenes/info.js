@@ -2,14 +2,8 @@ import Phaser from 'phaser';
 
 import makeFullScreenButton from 'src/fullscreen';
 import { APPLES, SHIPS, SECONDS } from 'src/levels/goals';
+import { BULLETS_COUNT, APPLES_COUNT, SHIPS_COUNT, SHIP_APPLES_COUNT, SHIP_HERO_COUNT } from 'src/registry';
 import LevelManager from 'src/levelManager';
-
-export const BULLETS_COUNT = 'bulletsCount';
-export const SHIPS_COUNT = 'shipsCount';
-export const APPLES_COUNT = 'applesCount';
-
-export const SHIP_HERO_COUNT = 'shipHeroCount';
-export const SHIP_APPLES_COUNT = 'shipApplesCount';
 
 export default class Info extends Phaser.Scene {
     constructor() {
@@ -33,19 +27,19 @@ export default class Info extends Phaser.Scene {
         this.texts = {};
 
         this.images[BULLETS_COUNT] = this.add.image(30, 26, 'rocketIcon');
-        this.texts[BULLETS_COUNT] = this.add.text(45, 16, '', { fontSize: '20px', fill: '#fff' });
+        this.texts[BULLETS_COUNT] = this.add.text(45, 16, '0', { fontSize: '20px', fill: '#fff' });
 
         this.images[APPLES_COUNT] = this.add.image(100, 24, 'appleIcon');
         this.texts[APPLES_COUNT] = this.add.text(117, 16, '0', { fontSize: '20px', fill: '#fff' });
 
         this.images[SHIPS_COUNT] = this.add.image(165, 26, 'shipIcon');
-        this.texts[SHIPS_COUNT] = this.add.text(185, 16, '', { fontSize: '20px', fill: '#fff' });
+        this.texts[SHIPS_COUNT] = this.add.text(185, 16, '0', { fontSize: '20px', fill: '#fff' });
 
         this.images[SHIP_HERO_COUNT] = this.add.image(screenWidth - 63, 26, 'heroIcon');
-        this.texts[SHIP_HERO_COUNT] = this.add.text(screenWidth - 45, 16, '', { fontSize: '20px', fill: '#fff' });
+        this.texts[SHIP_HERO_COUNT] = this.add.text(screenWidth - 45, 16, '0', { fontSize: '20px', fill: '#fff' });
 
         this.images[SHIP_APPLES_COUNT] = this.add.image(screenWidth - 125, 24, 'appleIcon');
-        this.texts[SHIP_APPLES_COUNT] = this.add.text(screenWidth - 108, 16, '', { fontSize: '20px', fill: '#fff' });
+        this.texts[SHIP_APPLES_COUNT] = this.add.text(screenWidth - 108, 16, '0', { fontSize: '20px', fill: '#fff' });
 
         this.goals = {
             APPLES: {

@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 
 import { activate, leadTo } from 'src/utils';
-import LevelManager from 'src/levelManager';
 
 export default class BaseShip extends Phaser.Physics.Arcade.Sprite {
     setDefaults() {
@@ -31,9 +30,6 @@ export default class BaseShip extends Phaser.Physics.Arcade.Sprite {
 
         this.setScale(this.scale);
         this.setRotation(this.rotation);
-
-        const level = LevelManager.getLevel();
-        this.velocityStepDown = level.playerVelocityStepDown;
     }
 
     playHitSound() {
@@ -52,39 +48,24 @@ export default class BaseShip extends Phaser.Physics.Arcade.Sprite {
         this.scene.sound.play('collectLovely', { volume: 0.2 });
     }
 
-    onChangeBulletsCount() {}
-
     setBulletsCount(value) {
-        if (this.bulletsCount !== value) {
-            this.bulletsCount = value;
-            this.onChangeBulletsCount(value);
-        }
+        this.bulletsCount = value;
     }
 
     changeBulletsCount(amount) {
         this.setBulletsCount(this.bulletsCount + amount);
     }
 
-    onChangeApplesCount() {}
-
     setApplesCount(value) {
-        if (this.applesCount !== value) {
-            this.applesCount = value;
-            this.onChangeApplesCount(value);
-        }
+        this.applesCount = value;
     }
 
     changeApplesCount(amount) {
         this.setApplesCount(this.applesCount + amount);
     }
 
-    onChangeShipsCount() {}
-
     setShipsCount(value) {
-        if (this.shipsCount !== value) {
-            this.shipsCount = value;
-            this.onChangeShipsCount(this.shipsCount);
-        }
+        this.shipsCount = value;
     }
 
     changeShipsCount(amount) {
@@ -94,12 +75,13 @@ export default class BaseShip extends Phaser.Physics.Arcade.Sprite {
     hit(gameObject) {
         this.playHitSound();
         this.changeApplesCount(-1);
+        this.body.velocity.y += gameObject.body.velocity.y / 2;
+        this.updateStroke();
         this.stroke.setVisible(true);
         this.stroke.anims.play(this.strokeAnimation);
         this.stroke.on('animationcomplete', () => {
             this.stroke.setVisible(false);
         });
-        this.body.velocity.y += gameObject.body.velocity.y / 2;
     }
 
     collectAmmo(count) {
@@ -151,18 +133,16 @@ export default class BaseShip extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    correctVelocityX() {
-        this.body.velocity.x = leadTo(this.targetVelocityX, this.body.velocity.x, this.velocityStepDown);
+    correctVelocityX(stepDown) {
+        this.body.velocity.x = leadTo(this.targetVelocityX, this.body.velocity.x, stepDown);
     }
 
-    correctVelocityY() {
-        this.body.velocity.y = leadTo(this.targetVelocityY, this.body.velocity.y, this.velocityStepDown);
+    correctVelocityY(stepDown) {
+        this.body.velocity.y = leadTo(this.targetVelocityY, this.body.velocity.y, stepDown);
     }
 
     preUpdate() {
         super.preUpdate.apply(this, arguments);
-        this.correctVelocityX();
-        this.correctVelocityY();
         this.updateStroke();
     }
 }

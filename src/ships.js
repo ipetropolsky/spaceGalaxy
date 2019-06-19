@@ -1,8 +1,9 @@
 import BaseShip from 'src/baseShip';
 import { SimpleAutoGroup } from 'src/autoGroup';
 import { SHIP } from 'src/layers';
-import { updateMembers } from 'src/utils';
+import { deactivate, updateMembers } from 'src/utils';
 import LevelManager from 'src/levelManager';
+import { SHIPS_COUNT, SHIP_APPLES_COUNT, SHIP_APPLES_IN_USE } from 'src/registry';
 
 export class Ship extends BaseShip {
     setDefaults() {
@@ -28,6 +29,12 @@ export class Ship extends BaseShip {
         this.flame.setVelocity(this.body.velocity.x, this.body.velocity.y);
     }
 
+    collectApple() {
+        super.collectApple();
+        this.scene.changeRegistry(SHIP_APPLES_COUNT, +1);
+        this.scene.changeRegistry(SHIP_APPLES_IN_USE, +1);
+    }
+
     setApplesCount(value) {
         const prevHasApples = this.applesCount > 0;
         super.setApplesCount(value);
@@ -47,7 +54,7 @@ export class Ship extends BaseShip {
         }
     }
 
-    start(x, y, vx, vy, hasCannon, hasApples, speed) {
+    start(x, y, vx, vy, hasCannon, apples, speed) {
         super.start(x, y, vx, vy, hasCannon);
         this.flame.setVisible(true);
         this.updateFlamePosition();
@@ -56,16 +63,13 @@ export class Ship extends BaseShip {
         if (hasCannon) {
             this.setBulletsCount(level.chargedShipInitialBullets);
         }
-        if (hasApples) {
-            this.setApplesCount(level.rainbowShipInitialApples);
+        if (apples) {
+            this.setApplesCount(apples);
+            this.scene.changeRegistry(SHIP_APPLES_IN_USE, +apples);
         }
         this.updateLook();
         // Для выравнивания скорости после столкновений
         this.setTargetVelocity(vx, vy);
-    }
-
-    onDeactivate() {
-        this.flame.setVisible(false);
     }
 
     fireEnabled() {
@@ -85,10 +89,26 @@ export class Ship extends BaseShip {
     hit() {
         super.hit.apply(this, arguments);
         this.updateFlamePosition();
+        this.scene.changeRegistry(SHIP_APPLES_COUNT, -1);
+        this.scene.changeRegistry(SHIP_APPLES_IN_USE, -1);
+    }
+
+    blowUp() {
+        deactivate(this);
+        this.scene.changeRegistry(SHIPS_COUNT, +1);
+        this.scene.changeRegistry(SHIP_APPLES_COUNT, -this.applesCount);
+    }
+
+    onDeactivate() {
+        this.flame.setVisible(false);
+        this.scene.changeRegistry(SHIP_APPLES_IN_USE, -this.applesCount);
     }
 
     preUpdate() {
         super.preUpdate.apply(this, arguments);
+        const level = LevelManager.getLevel();
+        this.correctVelocityX(level.shipVelocityStepDown);
+        this.correctVelocityY(level.shipVelocityStepDown);
         this.updateFlamePosition();
     }
 }
@@ -97,22 +117,25 @@ export default class ShipGroup extends SimpleAutoGroup {
     classType = Ship;
     depth = SHIP;
 
-    createOne(x, y, vx, vy, hasCannon, hasApples, speed) {
+    createOne(x, y, vx, vy, hasCannon, apples, speed) {
         const ship = this.get();
-        ship.start(x, y, vx, vy, hasCannon, hasApples, speed);
+        ship.start(x, y, vx, vy, hasCannon, apples, speed);
         return ship;
     }
 
     createRandom() {
         const level = LevelManager.getLevel();
-        const hasApples = Math.random() > 1 - level.rainbowShipRatio;
+        const totalApplesAvailable =
+            this.scene.registry.get(SHIP_APPLES_COUNT) - this.scene.registry.get(SHIP_APPLES_IN_USE);
+        const shipHasApples = totalApplesAvailable > 0 && Math.random() > 1 - level.rainbowShipRatio;
+        const applesCount = shipHasApples ? Math.min(level.rainbowShipInitialApples, totalApplesAvailable) : 0;
         const hasCannon = Math.random() > 1 - level.chargedShipRatio;
         const speed = Math.random();
         const x = 50 + Math.random() * (this.scene.game.config.width - 100);
         const y = -50;
         const vx = Math.random() * 2 * level.shipMaxVelocityX - level.shipMaxVelocityX;
         const vy = level.shipMinSpeed + speed * (level.shipMaxSpeed - level.shipMinSpeed);
-        return this.createOne(x, y, vx, vy, hasCannon, hasApples, speed);
+        return this.createOne(x, y, vx, vy, hasCannon, applesCount, speed);
     }
 
     onDeactivate(ship) {

@@ -1,6 +1,7 @@
 import BaseShip from 'src/baseShip';
 import { SHIP } from 'src/layers';
 import LevelManager from 'src/levelManager';
+import { BULLETS_COUNT, APPLES_COUNT, SHIPS_COUNT, SHIP_HERO_COUNT } from 'src/registry';
 
 export default class Player extends BaseShip {
     setDefaults() {
@@ -24,6 +25,10 @@ export default class Player extends BaseShip {
         this.hasCannon = level.playerCanFire;
         this.bulletsCount = level.playerInitialBullets;
 
+        this.scene.setRegistry(BULLETS_COUNT, this.bulletsCount);
+        this.scene.setRegistry(APPLES_COUNT, this.applesCount);
+        this.scene.setRegistry(SHIPS_COUNT, this.shipsCount);
+
         this.cursors = scene.input.keyboard.createCursorKeys();
         scene.input.keyboard.on('keydown-SPACE', () => {
             this.fire();
@@ -36,6 +41,27 @@ export default class Player extends BaseShip {
 
     fireEnabled() {
         return this.active && super.fireEnabled() && LevelManager.getLevel().playerCanFire;
+    }
+
+    setBulletsCount(value) {
+        if (value !== this.bulletsCount) {
+            super.setBulletsCount(value);
+            this.scene.setRegistry(BULLETS_COUNT, value);
+        }
+    }
+
+    setApplesCount(value) {
+        if (value !== this.applesCount) {
+            super.setApplesCount(value);
+            this.scene.setRegistry(APPLES_COUNT, value);
+        }
+    }
+
+    setShipsCount(value) {
+        if (value !== this.shipsCount) {
+            super.setShipsCount(value);
+            this.scene.setRegistry(SHIPS_COUNT, value);
+        }
     }
 
     emptyShot() {
@@ -59,7 +85,7 @@ export default class Player extends BaseShip {
             this.body.velocity.x += level.playerVelocityStepUp;
             frame += 6;
         } else {
-            this.correctVelocityX();
+            this.correctVelocityX(level.playerVelocityStepDown);
         }
 
         if (this.cursors.up.isDown && !this.cursors.down.isDown) {
@@ -69,7 +95,7 @@ export default class Player extends BaseShip {
             this.body.velocity.y += level.playerVelocityStepUp;
             frame += 1;
         } else {
-            this.correctVelocityY();
+            this.correctVelocityY(level.playerVelocityStepDown);
         }
 
         this.setFrame(frame);
@@ -78,6 +104,12 @@ export default class Player extends BaseShip {
     hit() {
         super.hit.apply(this, arguments);
         this.updateStroke();
+    }
+
+    blowUp() {
+        this.scene.sound.play('blowUpHero', { volume: 0.5 });
+        this.disableBody(true, true);
+        this.scene.changeRegistry(SHIP_HERO_COUNT, +1);
     }
 
     preUpdate() {

@@ -8,27 +8,33 @@ import {
     HeavyChargedShip,
     SilentChargedShipModifier,
 } from 'src/levels/chargedShips';
-import { SlowShipFactory, BaseShipFactory, QuickShipFactory, SpeedyShipFactory } from 'src/levels/shipFactory';
+import {
+    SlowShipFactory,
+    BaseShipFactory,
+    QuickShipFactory,
+    QuickShipFactory2,
+    SpeedyShipFactory,
+} from 'src/levels/shipFactory';
 import { SlowAppleFactory, BaseAppleFactory, QuickAppleFactory } from 'src/levels/appleFactory';
 import { Daylight, DuskLight, Dusk } from 'src/levels/luminosity';
 
 const DefaultLevel = {
-    skySpeed: 2,
     ...SlowPlayer,
     ...NoCannon,
     ...ChargedShip,
     ...SlowShipFactory,
     ...SlowAppleFactory,
     ...Daylight,
+    skySpeed: 2,
 };
 
 export const Level1 = {
     ...DefaultLevel,
+    ...BaseCannon,
     ...GoalApples(10),
 };
 
 export const Level2 = {
-    skySpeed: 2,
     ...Level1,
     ...BasePlayer,
     ...BaseCannon,
@@ -43,38 +49,52 @@ export const Level2Dark = {
     ...SilentChargedShipModifier(),
     ...DuskLight,
     ...GoalSeconds(60),
+    skySpeed: 3,
 };
 
 export const Level3 = {
-    skySpeed: 3,
     ...Level2,
-    ...QuickPlayer,
-    ...QuickCannon,
     ...QuickChargedShip,
     ...QuickShipFactory,
-    ...QuickAppleFactory,
-    ...GoalShips(20),
+    ...GoalShips(15),
+    skySpeed: 3,
+};
+
+export const Level3a = {
+    ...Level3,
+    ...QuickPlayer,
+    ...QuickCannon,
+    ...GoalShips(15),
 };
 
 export const Level3Dark = {
-    ...Level3,
+    ...Level3a,
     ...BaseChargedShip,
+    ...QuickAppleFactory,
     ...DuskLight,
     ...GoalApples(15),
+    skySpeed: 4,
 };
 
 export const Level4 = {
-    skySpeed: 4,
-    ...Level3,
+    ...Level3a,
     ...SpeedyPlayer,
-    ...SpeedyCannon,
-    ...SpeedyShipFactory,
+    ...QuickShipFactory2,
     ...HeavyChargedShip,
     ...GoalSeconds(60),
+    skySpeed: 4,
+};
+
+export const Level4a = {
+    ...Level4,
+    ...SpeedyCannon,
+    ...SpeedyShipFactory,
+    ...GoalApples(15),
 };
 
 export const Level4Dark = {
-    ...Level4,
+    ...Level4a,
     ...Dusk,
-    ...GoalApples(10),
+    ...GoalShips(15),
+    skySpeed: 5,
 };

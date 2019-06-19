@@ -9,13 +9,25 @@ import ShipBulletGroup from 'src/shipBullets';
 import ShipGroup from 'src/ships';
 import { deactivate } from 'src/utils';
 import LevelManager from 'src/levelManager';
-import { BULLETS_COUNT, APPLES_COUNT, SHIPS_COUNT, SHIP_APPLES_COUNT, SHIP_HERO_COUNT } from './info';
 
 export default class Main extends Phaser.Scene {
     constructor() {
         super('main');
         this.shipHeroCount = 0;
         this.shipApplesCount = 0;
+    }
+
+    setRegistry(name, value) {
+        this.registry.set(name, value);
+        this.scene.get('info').animateCounter(name);
+    }
+
+    changeRegistry(name, amount) {
+        if (amount) {
+            const value = this.registry.get(name) || 0;
+            this.registry.set(name, value + amount);
+            this.scene.get('info').animateCounter(name);
+        }
     }
 
     preload() {
@@ -96,7 +108,7 @@ export default class Main extends Phaser.Scene {
                     this.time.addEvent({
                         delay: 40,
                         callback: () => {
-                            this.player.changeApplesCount(-1, true);
+                            this.player.changeApplesCount(-1);
                         },
                         repeat: this.player.applesCount - 1,
                     });
@@ -157,25 +169,6 @@ export default class Main extends Phaser.Scene {
         this.player.onFire = () => {
             this.bullets.fireFrom(this.player);
         };
-        this.player.onChangeBulletsCount = (value) => {
-            this.registry.set(BULLETS_COUNT, value);
-            this.scene.get('info').animateCounter(BULLETS_COUNT);
-        };
-        this.player.onChangeApplesCount = (value) => {
-            this.registry.set(APPLES_COUNT, value);
-            this.scene.get('info').animateCounter(APPLES_COUNT);
-        };
-        this.player.onChangeShipsCount = (value) => {
-            this.registry.set(SHIPS_COUNT, value);
-            this.scene.get('info').animateCounter(SHIPS_COUNT);
-        };
-
-        this.registry.set(BULLETS_COUNT, this.player.bulletsCount);
-        this.registry.set(APPLES_COUNT, this.player.applesCount);
-        this.registry.set(SHIPS_COUNT, this.player.shipsCount);
-        this.scene.get('info').animateCounter(BULLETS_COUNT);
-        this.scene.get('info').animateCounter(APPLES_COUNT);
-        this.scene.get('info').animateCounter(SHIPS_COUNT);
 
         this.ships = new ShipGroup(this.physics.world, this);
         const eventConfig = {
@@ -231,15 +224,9 @@ export default class Main extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.ships, (player, ship) => {
             if (player.active) {
                 this.explosions2.bump(player, ship, { silent: true });
-                this.sound.play('blowUpHero', { volume: 0.5 });
-
                 putAmmo(ship);
-                deactivate(ship);
-                player.disableBody(true, true);
-
-                this.registry.set(SHIP_HERO_COUNT, ++this.shipHeroCount);
-                this.scene.get('info').animateCounter(SHIP_HERO_COUNT);
-
+                ship.blowUp(player);
+                player.blowUp(ship);
                 restartGame();
             }
         });
@@ -257,9 +244,9 @@ export default class Main extends Phaser.Scene {
                 this.explosions.bump(ship1, ship2);
                 this.player.changeShipsCount(+2);
                 putAmmo(ship1);
-                deactivate(ship1);
+                ship1.blowUp(ship2);
                 putAmmo(ship2);
-                deactivate(ship2);
+                ship2.blowUp(ship1);
             }
         });
 
@@ -273,7 +260,7 @@ export default class Main extends Phaser.Scene {
                         this.explosions.blowUp(ship);
                         this.player.changeShipsCount(+1);
                         putAmmo(ship);
-                        deactivate(ship);
+                        ship.blowUp(bullet);
                     }
                     deactivate(bullet);
                 }
@@ -286,12 +273,7 @@ export default class Main extends Phaser.Scene {
                     player.hit(bullet);
                 } else {
                     this.explosions2.blowUp(player, { silent: true });
-                    this.sound.play('blowUpHero', { volume: 0.5 });
-
-                    this.registry.set(SHIP_HERO_COUNT, ++this.shipHeroCount);
-                    this.scene.get('info').animateCounter(SHIP_HERO_COUNT);
-
-                    player.disableBody(true, true);
+                    player.blowUp(bullet);
                     restartGame();
                 }
                 deactivate(bullet);
@@ -317,16 +299,9 @@ export default class Main extends Phaser.Scene {
         this.physics.add.overlap([this.player, this.ships], this.apples, (ship, apple) => {
             if (ship.active) {
                 ship.collectApple();
-                if (this.ships.contains(ship)) {
-                    this.registry.set(SHIP_APPLES_COUNT, ++this.shipApplesCount);
-                    this.scene.get('info').animateCounter(SHIP_APPLES_COUNT);
-                }
                 deactivate(apple);
             }
         });
-
-        this.registry.set(SHIP_APPLES_COUNT, this.shipApplesCount);
-        this.registry.set(SHIP_HERO_COUNT, this.shipHeroCount);
 
         this.cameras.main.fadeIn(1000);
     }
