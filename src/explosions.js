@@ -34,11 +34,6 @@ export default class ExplosionGroup extends SimpleAutoGroup {
     classType = Explosion;
     depth = BULLET;
 
-    blowUp(gameObject, extra = {}) {
-        const explosion = this.get();
-        explosion.fire(gameObject.x, gameObject.y, gameObject.body.velocity.x, gameObject.body.velocity.y, extra);
-    }
-
     bump(gameObject1, gameObject2, extra = {}) {
         const explosion = this.get();
         explosion.fire(
@@ -48,6 +43,11 @@ export default class ExplosionGroup extends SimpleAutoGroup {
             (gameObject1.body.velocity.y + gameObject2.body.velocity.y) / 2,
             extra
         );
+        const power = (gameObject1.power || 0.5) + (gameObject2.power || 0.5);
+        const duration = 200 * power;
+        const intensity = 0.004 * power;
+        this.scene.cameras.main.shake(duration, intensity, true);
+        this.scene.scene.get('sky').cameras.main.shake(duration, intensity, true);
     }
 }
 

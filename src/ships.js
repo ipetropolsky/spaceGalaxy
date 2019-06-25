@@ -61,7 +61,10 @@ export class Ship extends BaseShip {
         this.speed = speed;
         const level = LevelManager.getLevel();
         if (hasCannon) {
+            this.power = 0.75;
             this.setBulletsCount(level.chargedShipInitialBullets);
+        } else {
+            this.power = 0.5;
         }
         if (apples) {
             this.setApplesCount(apples);

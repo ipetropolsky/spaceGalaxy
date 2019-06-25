@@ -6,6 +6,8 @@ import { activate } from 'src/utils';
 import LevelManager from 'src/levelManager';
 
 export class Bullet extends Phaser.Physics.Arcade.Image {
+    power = 0.2;
+
     constructor(scene, x, y) {
         super(scene, x, y, 'rocket');
         scene.add.existing(this);

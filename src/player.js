@@ -4,6 +4,8 @@ import LevelManager from 'src/levelManager';
 import { BULLETS_COUNT, APPLES_COUNT, SHIPS_COUNT, SHIP_HERO_COUNT } from 'src/registry';
 
 export default class Player extends BaseShip {
+    power = 1.5;
+
     setDefaults() {
         super.setDefaults();
         this.scale = 2;
@@ -104,6 +106,8 @@ export default class Player extends BaseShip {
     hit() {
         super.hit.apply(this, arguments);
         this.updateStroke();
+        this.scene.cameras.main.shake(200, 0.005, true);
+        this.scene.scene.get('sky').cameras.main.shake(200, 0.005, true);
     }
 
     blowUp() {

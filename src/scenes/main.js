@@ -257,7 +257,7 @@ export default class Main extends Phaser.Scene {
                     if (ship.applesCount > 0) {
                         ship.hit(bullet);
                     } else {
-                        this.explosions.blowUp(ship);
+                        this.explosions.bump(ship, bullet);
                         this.player.changeShipsCount(+1);
                         putAmmo(ship);
                         ship.blowUp(bullet);
@@ -272,7 +272,7 @@ export default class Main extends Phaser.Scene {
                 if (player.applesCount > 0) {
                     player.hit(bullet);
                 } else {
-                    this.explosions2.blowUp(player, { silent: true });
+                    this.explosions2.bump(player, bullet, { silent: true });
                     player.blowUp(bullet);
                     restartGame();
                 }

@@ -6,6 +6,8 @@ import { activate } from 'src/utils';
 import LevelManager from 'src/levelManager';
 
 class Apple extends Phaser.Physics.Arcade.Sprite {
+    power = 1;
+
     constructor(scene, x, y) {
         super(scene, x, y, 'apple');
     }

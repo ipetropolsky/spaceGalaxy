@@ -64,7 +64,7 @@ export const Level3a = {
     ...Level3,
     ...QuickPlayer,
     ...QuickCannon,
-    ...GoalShips(15),
+    ...GoalShips(20),
 };
 
 export const Level3Dark = {

@@ -3,6 +3,8 @@ import Phaser from 'phaser';
 import { activate, leadTo } from 'src/utils';
 
 export default class BaseShip extends Phaser.Physics.Arcade.Sprite {
+    power = 0.5;
+
     setDefaults() {
         this.scale = 2;
         this.rotation = 0;
