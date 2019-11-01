@@ -48,7 +48,7 @@ export const Level2Dark = {
     ...Level2,
     ...SilentChargedShipModifier(),
     ...DuskLight,
-    ...GoalSeconds(60),
+    ...GoalSeconds(10),
     skySpeed: 3,
 };
 

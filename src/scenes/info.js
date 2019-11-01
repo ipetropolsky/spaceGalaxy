@@ -1,9 +1,17 @@
 import Phaser from 'phaser';
 
 import makeFullScreenButton from 'src/fullscreen';
-import { APPLES, SHIPS, SECONDS } from 'src/levels/goals';
-import { BULLETS_COUNT, APPLES_COUNT, SHIPS_COUNT, SHIP_APPLES_COUNT, SHIP_HERO_COUNT } from 'src/registry';
-import LevelManager from 'src/levelManager';
+import {
+    BULLETS_COUNT,
+    APPLES_COUNT,
+    SHIPS_COUNT,
+    SHIP_APPLES_COUNT,
+    SHIP_HERO_COUNT,
+    GOAL,
+    GOAL_APPLES,
+    GOAL_SHIPS,
+    GOAL_SECONDS,
+} from 'src/registry';
 
 export default class Info extends Phaser.Scene {
     constructor() {
@@ -20,6 +28,19 @@ export default class Info extends Phaser.Scene {
     }
 
     create() {
+        this.input.keyboard.on('keydown-ESC', () => {
+            if (this.scene.isPaused('main')) {
+                this.scene.get('main').time.paused = true;
+                this.scene.resume('main');
+                this.scene.resume('sky');
+            } else {
+                // debugger;
+                this.scene.get('main').time.paused = false;
+                this.scene.pause('main');
+                this.scene.pause('sky');
+            }
+        });
+
         const screenWidth = this.game.config.width;
         const screenHeight = this.game.config.height;
 
@@ -42,15 +63,15 @@ export default class Info extends Phaser.Scene {
         this.texts[SHIP_APPLES_COUNT] = this.add.text(screenWidth - 108, 16, '0', { fontSize: '20px', fill: '#fff' });
 
         this.goals = {
-            APPLES: {
+            [GOAL_APPLES]: {
                 image: this.add.image(30, screenHeight - 16, 'appleIcon'),
                 text: this.add.text(47, screenHeight - 24, '', { fontSize: '20px', fill: '#fff' }),
             },
-            SHIPS: {
+            [GOAL_SHIPS]: {
                 image: this.add.image(27, screenHeight - 14, 'shipIcon'),
                 text: this.add.text(47, screenHeight - 24, '', { fontSize: '20px', fill: '#fff' }),
             },
-            SECONDS: {
+            [GOAL_SECONDS]: {
                 image: this.add.image(32, screenHeight - 14, 'timeIcon'),
                 text: this.add.text(47, screenHeight - 24, '', { fontSize: '20px', fill: '#fff' }),
             },
@@ -97,22 +118,25 @@ export default class Info extends Phaser.Scene {
             const target = this.texts[key];
             target.setText(data);
         }
-        if (key === 'goal') {
+        if (key === GOAL) {
             this.goal = data;
-            [APPLES, SHIPS, SECONDS].forEach((type) => {
+            [GOAL_APPLES, GOAL_SHIPS, GOAL_SECONDS].forEach((type) => {
                 this.goals[type].image.setVisible(type === data.type);
                 this.goals[type].text.setVisible(type === data.type);
                 this.goals[type].text.setText(data.param);
             });
         }
+        if (key in this.goals) {
+            this.goals[this.goal.type].text.setText(data);
+        }
     };
 
     update() {
-        if (this.goal && this.goal.type === SECONDS) {
-            const level = LevelManager.getLevel();
-            this.goals[this.goal.type].text.setText(
-                (this.goal.param - (this.scene.get('main').time.now - level.startTime) / 1000).toFixed(2)
-            );
-        }
+        // if (this.goal && this.goal.type === SECONDS) {
+        //     const level = LevelManager.getLevel();
+        //     this.goals[this.goal.type].text.setText(
+        //         (this.goal.param - (this.scene.get('main').time.now - level.startTime) / 1000).toFixed(2)
+        //     );
+        // }
     }
 }

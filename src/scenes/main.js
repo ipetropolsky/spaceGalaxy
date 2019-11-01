@@ -13,8 +13,6 @@ import LevelManager from 'src/levelManager';
 export default class Main extends Phaser.Scene {
     constructor() {
         super('main');
-        this.shipHeroCount = 0;
-        this.shipApplesCount = 0;
     }
 
     setRegistry(name, value) {
@@ -94,9 +92,26 @@ export default class Main extends Phaser.Scene {
         });
     }
 
+    _pauseStart = 0;
+    onGamePause = () => {
+        this._pauseStart = this.time.now;
+
+        // Чтобы клавиши не «залипали» после возобновления игры
+        this.input.keyboard.resetKeys();
+
+        this.game.events.once('poststep', this.onGameResume);
+
+        console.log('pause', this.pausedTime, this.time.now, this._pauseStart);
+    };
+
+    onGameResume = () => {
+        this.pausedTime += this.time.now - this._pauseStart;
+        console.log('resume', this.pausedTime, this.time.now, this._pauseStart);
+    };
+
     create() {
         const level = LevelManager.getLevel();
-        LevelManager.setLevel(this, level ? level.index : 0, true);
+        LevelManager.setLevel(this, level ? level.index : 2, true);
 
         const restartGame = () => {
             this.cameras.main.on('camerafadeoutcomplete', () => {
@@ -115,6 +130,27 @@ export default class Main extends Phaser.Scene {
                 }, 1500 - 45 * this.player.applesCount);
             }
         };
+
+        this.pausedTime = 0;
+        this.game.events.on('pause', this.onGamePause);
+
+        this.events.on('pause', () => {
+            this.shipFactoryTimer.paused = true;
+            this.appleFactoryTimer.paused = true;
+
+            // console.log('pause', this.pausedTime, this.time.now, pauseStart);
+
+            // this.events.once('update', () => {
+            //     this.pausedTime += this.time.now - pauseStart;
+            //     console.log('resume', this.pausedTime, this.time.now, pauseStart);
+            // });
+        });
+
+        this.events.on('resume', () => {
+            // console.log(this.shipFactoryTimer);
+            // this.shipFactoryTimer.paused = false;
+            // this.appleFactoryTimer.paused = false;
+        });
 
         this.anims.create({
             key: 'appleRotation',
@@ -176,13 +212,14 @@ export default class Main extends Phaser.Scene {
             callback: () => {
                 this.ships.createRandom();
                 const level = LevelManager.getLevel();
-                this.time.addEvent({
+                console.log('add ships timer', this.scene.isPaused());
+                this.shipFactoryTimer = this.time.addEvent({
                     callback: eventConfig.callback,
                     delay: Phaser.Math.RND.integerInRange(level.shipFactoryDelayMin, level.shipFactoryDelayMax),
                 });
             },
         };
-        this.time.addEvent(eventConfig);
+        this.shipFactoryTimer = this.time.addEvent(eventConfig);
 
         this.apples = new AppleGroup(this.physics.world, this);
         const eventConfigForApples = {
@@ -190,13 +227,13 @@ export default class Main extends Phaser.Scene {
             callback: () => {
                 this.apples.createRandom();
                 const level = LevelManager.getLevel();
-                this.time.addEvent({
+                this.appleFactoryTimer = this.time.addEvent({
                     callback: eventConfigForApples.callback,
                     delay: Phaser.Math.RND.integerInRange(level.appleFactoryDelayMin, level.appleFactoryDelayMax),
                 });
             },
         };
-        this.time.addEvent(eventConfigForApples);
+        this.appleFactoryTimer = this.time.addEvent(eventConfigForApples);
 
         this.bullets = new BulletGroup(this.physics.world, this);
         this.shipBullets = new ShipBulletGroup(this.physics.world, this);

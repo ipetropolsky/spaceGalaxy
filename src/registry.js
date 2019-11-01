@@ -5,3 +5,8 @@ export const APPLES_COUNT = 'applesCount';
 export const SHIP_HERO_COUNT = 'shipHeroCount';
 export const SHIP_APPLES_COUNT = 'shipApplesCount';
 export const SHIP_APPLES_IN_USE = 'shipApplesInUse';
+
+export const GOAL = 'goal';
+export const GOAL_SHIPS = 'goalShips';
+export const GOAL_APPLES = 'goalApples';
+export const GOAL_SECONDS = 'goalSeconds';
